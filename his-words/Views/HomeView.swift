@@ -150,9 +150,6 @@ private struct FeaturedCard: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                if playlist.isPremium {
-                    PremiumBadge()
-                }
                 Text(playlist.title)
                     .font(.system(size: 24, weight: .semibold, design: .serif))
                     .foregroundColor(.creamWhite)
@@ -194,9 +191,6 @@ private struct CategoryCard: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                if playlist.isPremium {
-                    PremiumBadge()
-                }
                 Text(playlist.title)
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundColor(.creamWhite)

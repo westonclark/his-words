@@ -16,9 +16,18 @@ struct MiniPlayerView: View {
                                 endPoint: .bottomTrailing
                             ))
                             .frame(width: 44, height: 44)
-                        Image(systemName: track.category.icon)
-                            .foregroundColor(.creamWhite.opacity(0.85))
-                            .font(.system(size: 16))
+                        if let imageName = audio.currentPlaylistImageName,
+                           let uiImage = UIImage(named: imageName) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 44, height: 44)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        } else {
+                            Image(systemName: track.category.icon)
+                                .foregroundColor(.creamWhite.opacity(0.85))
+                                .font(.system(size: 16))
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 2) {

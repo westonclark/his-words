@@ -256,9 +256,11 @@ private struct TrackRow: View {
                 .font(.system(size: 15, weight: isActive ? .semibold : .regular, design: .rounded))
                 .foregroundColor(isActive ? .mutedGold : .creamWhite)
             HStack(spacing: 6) {
-                Text(formatDuration(track.duration))
-                    .font(.system(size: 12, design: .rounded))
-                    .foregroundColor(.mutedCream)
+                if let label = durationLabel {
+                    Text(label)
+                        .font(.system(size: 12, design: .rounded))
+                        .foregroundColor(.mutedCream)
+                }
                 if downloadState == .downloaded {
                     Image(systemName: "arrow.down.circle.fill")
                         .font(.system(size: 11))
@@ -306,9 +308,16 @@ private struct TrackRow: View {
         }
     }
 
-    private func formatDuration(_ seconds: TimeInterval) -> String {
-        let mins = Int(seconds) / 60
-        let hrs  = mins / 60
-        return hrs > 0 ? "\(hrs)h loop" : "\(mins)m loop"
+    private var durationLabel: String? {
+        let total = Int(track.duration)
+        guard total > 0 else { return nil }
+        if track.isLoop {
+            let mins = total / 60
+            let hrs  = mins / 60
+            return hrs > 0 ? "\(hrs)h loop" : "\(mins)m loop"
+        }
+        let mins = total / 60
+        let secs = total % 60
+        return String(format: "%d:%02d", mins, secs)
     }
 }

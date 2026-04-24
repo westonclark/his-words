@@ -7,6 +7,13 @@ struct Track: Identifiable, Codable, Hashable {
     let duration: TimeInterval
     let streamURL: String
     let isPremium: Bool
+    let isLoop: Bool
+
+    init(id: UUID, title: String, category: Category, duration: TimeInterval, streamURL: String, isPremium: Bool, isLoop: Bool = false) {
+        self.id = id; self.title = title; self.category = category
+        self.duration = duration; self.streamURL = streamURL
+        self.isPremium = isPremium; self.isLoop = isLoop
+    }
 
     enum Category: String, CaseIterable, Codable, Hashable {
         case rain, forest, ocean, wind, fire, affirmations
