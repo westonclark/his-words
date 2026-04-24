@@ -126,9 +126,8 @@ iPhone Meditation App — Plan
   - [ ] Sandbox testing on device
 
   Phase 4 — Finish & Ship
-  - [ ] Sleep timer: implement stop-playback logic in PlayerView (UI already exists)
   - [ ] Settings screen (subscription status, manage/cancel deep link to App Store)
-  - [ ] Add background audio in Xcode: Signing & Capabilities → Background Modes → Audio
+  - [x] Add background audio in Xcode: Signing & Capabilities → Background Modes → Audio
   - [ ] App Store screenshots + submission
 
   ---
