@@ -13,7 +13,7 @@ struct OnboardingView: View {
         (
             "brain.head.profile",
             "Backed By Science",
-            "Research has proven that the brain rewires for better when scripture is spoken over it."
+            "Research has proven that the brain can be rewired by speaking scripture over it."
         ),
         (
             "waveform",
