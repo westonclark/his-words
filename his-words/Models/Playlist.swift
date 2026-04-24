@@ -117,15 +117,6 @@ private let biblicalOceanWavesTracks: [Track] = [
 extension Playlist {
     static let catalog: [Playlist] = [
         Playlist(
-            id: UUID(uuidString: "00000001-0000-0000-0000-000000000000")!,
-            title: "Affirmations for Confidence + Healing Frequencies",
-            subtitle: "Walk in the fullness of who God made you",
-            category: .affirmations,
-            tracks: affirmationsConfidenceTracks,
-            isPremium: true,
-            imageName: "affirmations-confidence-healing"
-        ),
-        Playlist(
             id: UUID(uuidString: "00000002-0000-0000-0000-000000000000")!,
             title: "Biblical Identity Affirmations + Thunderstorms & 528Hz",
             subtitle: "Scripture-rooted identity over thunder and healing tones",
@@ -144,9 +135,18 @@ extension Playlist {
             imageName: "biblical-identity-ocean-waves"
         ),
         Playlist(
+            id: UUID(uuidString: "00000001-0000-0000-0000-000000000000")!,
+            title: "Affirmations for Confidence + Healing Frequencies",
+            subtitle: "Walk in the fullness of who God made you",
+            category: .affirmations,
+            tracks: affirmationsConfidenceTracks,
+            isPremium: true,
+            imageName: "affirmations-confidence-healing"
+        ),
+        Playlist(
             id: UUID(uuidString: "00000004-0000-0000-0000-000000000000")!,
             title: "Ocean Waves + Healing Frequencies for Sleep",
-            subtitle: "50 minutes of ocean waves and healing frequencies",
+            subtitle: "1hr loop of ocean waves and healing frequencies",
             category: .ocean,
             tracks: [
                 Track(id: UUID(uuidString: "D0000000-0000-0000-0000-000000000001")!, title: "Ocean Waves + Healing Frequencies", category: .ocean, duration: 3038, streamURL: "\(cdnBase)/ocean-waves-sleep/01-ocean-waves-healing-sleep.aac", isPremium: false, isLoop: true),
@@ -156,5 +156,5 @@ extension Playlist {
         ),
     ]
 
-    static var featured: Playlist { catalog[0] }
+    static var featured: Playlist { catalog[3] }
 }

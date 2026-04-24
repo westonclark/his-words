@@ -28,6 +28,15 @@ struct MiniPlayerView: View {
                                 .foregroundColor(.creamWhite.opacity(0.85))
                                 .font(.system(size: 16))
                         }
+                        if audio.isPlaying {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(.black.opacity(0.45))
+                                .frame(width: 44, height: 44)
+                            Image(systemName: "waveform")
+                                .foregroundColor(.creamWhite.opacity(0.9))
+                                .font(.system(size: 16))
+                                .symbolEffect(.variableColor.iterative, isActive: true)
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 2) {

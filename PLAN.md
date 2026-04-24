@@ -63,10 +63,8 @@ iPhone Meditation App — Plan
   │   └── Trial progress bar (non-subscribers) ✓
   ├── Mini Player ✓
   │   └── Shows album artwork ✓
-  ├── Paywall Screen ✓
-  │   └── Triggered at 10min lifetime, on locked content tap, or "Get Premium" ✓
-  └── Settings / Profile — TODO
-      └── Subscription status, manage/cancel link
+  └── Paywall Screen ✓
+      └── Triggered at 10min lifetime, on locked content tap, or "Get Premium" ✓
 
   ---
   Subscription Model
@@ -120,6 +118,7 @@ iPhone Meditation App — Plan
   - [ ] Wire StoreKit 2 purchase flow in PaywallView (replace stub in PaywallView.swift)
   - [ ] Verify entitlement on launch via Transaction.currentEntitlements
   - [ ] Handle subscription expiry / renewal
+  - [x] Add a "Manage Your Subscription" button to the UI
   - [ ] Wire "Restore Purchases" button in PaywallView (currently a no-op)
   - [ ] Sandbox testing on device
 
