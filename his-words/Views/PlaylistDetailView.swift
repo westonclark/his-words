@@ -161,6 +161,10 @@ struct PlaylistDetailView: View {
             appState.showPaywall = true
             return
         }
+        if audio.currentTrack?.id == track.id {
+            showPlayer = true
+            return
+        }
         let playableTracks = trial.isSubscribed
             ? playlist.tracks
             : playlist.tracks.filter { !$0.isPremium }
