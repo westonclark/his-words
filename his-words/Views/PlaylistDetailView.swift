@@ -148,7 +148,7 @@ struct PlaylistDetailView: View {
                 return (track.id, url)
             }
         )
-        audio.play(playlist: accessibleTracks, startingAt: 0, localURLs: localURLs)
+        audio.play(playlist: accessibleTracks, startingAt: 0, localURLs: localURLs, imageName: playlist.imageName, totalCount: playlist.tracks.count)
         showPlayer = true
     }
 
@@ -171,7 +171,7 @@ struct PlaylistDetailView: View {
                 return (t.id, url)
             }
         )
-        audio.play(playlist: playableTracks, startingAt: startIndex, localURLs: localURLs)
+        audio.play(playlist: playableTracks, startingAt: startIndex, localURLs: localURLs, imageName: playlist.imageName, totalCount: playlist.tracks.count)
         showPlayer = true
     }
 

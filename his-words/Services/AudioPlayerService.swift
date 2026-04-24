@@ -8,6 +8,8 @@ final class AudioPlayerService: ObservableObject {
     @Published var currentIndex: Int = 0
     @Published var isLooping: Bool = true
     @Published var sessionSeconds: TimeInterval = 0
+    @Published var currentPlaylistImageName: String? = nil
+    @Published var currentPlaylistTotalCount: Int = 0
 
     private var player: AVPlayer?
     private var endObserver: NSObjectProtocol?
@@ -25,10 +27,12 @@ final class AudioPlayerService: ObservableObject {
 
     // MARK: – Public API
 
-    func play(playlist: [Track], startingAt index: Int = 0, localURLs: [UUID: URL] = [:]) {
+    func play(playlist: [Track], startingAt index: Int = 0, localURLs: [UUID: URL] = [:], imageName: String? = nil, totalCount: Int = 0) {
         localURLOverrides = localURLs
         currentPlaylist = playlist
         currentIndex = index
+        currentPlaylistImageName = imageName
+        currentPlaylistTotalCount = totalCount > 0 ? totalCount : playlist.count
         playCurrentTrack()
     }
 
@@ -82,6 +86,8 @@ final class AudioPlayerService: ObservableObject {
         teardown()
         currentPlaylist = []
         currentIndex = 0
+        currentPlaylistTotalCount = 0
+        currentPlaylistImageName = nil
     }
 
     func resetSessionTime() {

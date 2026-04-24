@@ -8,7 +8,30 @@ struct PlayerView: View {
 
     var body: some View {
         ZStack {
-            backgroundGradient
+            Color.warmBlack.ignoresSafeArea()
+
+            if let imageName = audio.currentPlaylistImageName {
+                Image(imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(minWidth: 0, maxWidth: .infinity)
+                    .clipped() // Cuts off the horizontal overflow
+                    .ignoresSafeArea()
+                    .overlay {
+                        LinearGradient(
+                            stops: [
+                                .init(color: .black.opacity(0.15), location: 0),
+                                .init(color: .black.opacity(0.5),  location: 0.5),
+                                .init(color: .black.opacity(0.88), location: 1.0),
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    }
+            } else {
+                backgroundGradient
+            }
 
             VStack(spacing: 0) {
                 dragHandle
@@ -16,9 +39,6 @@ struct PlayerView: View {
                 Spacer()
 
                 if let track = audio.currentTrack {
-                    BreathingCircleView(gradient: track.category.gradient)
-                        .padding(.bottom, 16)
-
                     trackInfo(track: track)
                 }
 
@@ -27,9 +47,9 @@ struct PlayerView: View {
                 trialProgress
 
                 controls
-
                     .padding(.bottom, 48)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 24)
         }
         .onChange(of: trial.hasExhaustedTrial) { _, exhausted in
@@ -73,12 +93,12 @@ struct PlayerView: View {
                 .foregroundColor(.creamWhite)
             Text(track.category.displayName)
                 .font(.system(size: 15, design: .rounded))
-                .foregroundColor(.mutedCream)
+                .foregroundColor(.creamWhite.opacity(0.72))
 
-            if audio.currentPlaylist.count > 1 {
-                Text("\(audio.currentIndex + 1) of \(audio.currentPlaylist.count)")
+            if audio.currentPlaylistTotalCount > 1 {
+                Text("\(audio.currentIndex + 1) of \(audio.currentPlaylistTotalCount)")
                     .font(.system(size: 12, design: .rounded))
-                    .foregroundColor(.mutedCream.opacity(0.7))
+                    .foregroundColor(.creamWhite.opacity(0.45))
                     .padding(.top, 2)
             }
         }
