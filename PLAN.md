@@ -2,7 +2,7 @@ iPhone Meditation App — Plan
 
   App Overview
 
-  A nature-sounds meditation app with curated playlists, a 10-minute free trial, and a subscription paywall. Design inspired by Calm/Headspace.
+  A biblical affirmations and nature-sounds app with curated playlists, a 10-minute free trial, and a subscription paywall. Design inspired by Calm/Headspace.
 
   ---
   Tech Stack
@@ -26,13 +26,22 @@ iPhone Meditation App — Plan
 
   Store on Cloudflare R2, stream via CDN (not bundled in app)
 
-  - Audio files stay small (compressed AAC, ~1MB/min)
-  - Users stream on demand — no 500MB app download
+  - CDN base URL: https://pub-d6aadca8714e4a51804dc8762b7f9f6d.r2.dev ✓
+  - Audio files converted from WAV → AAC 192kbps stereo ✓
+  - Durations hardcoded in Playlist.swift (from ffprobe) ✓
+  - Users stream on demand — no large app download
   - You can update/add files without an app update
   - Free trial enforcement tracked locally via UserDefaults — 10 minutes lifetime, never resets
   - Subscribers can download tracks for offline playback (stored in app Documents directory)
+  - isLoop flag on Track — loop tracks show "Xm loop", others show m:ss duration ✓
 
-  File format: AAC 128kbps, seamlessly looped (use Audacity/Logic to trim for gapless looping)
+  ---
+  Catalog (4 playlists, 87 tracks total)
+
+  1. Affirmations for Confidence + Healing Frequencies — 25 tracks, affirmations category
+  2. Biblical Identity Affirmations + Thunderstorms & 528Hz — 30 tracks, rain category
+  3. Biblical Identity Affirmations + Ocean Waves & Solfeggio Frequencies — 31 tracks, ocean category
+  4. Ocean Waves + Healing Frequencies for Sleep — 1 track (~50 min loop), ocean category
 
   ---
   App Architecture
@@ -41,7 +50,7 @@ iPhone Meditation App — Plan
   ├── Onboarding (3 screens) ✓
   ├── Home ✓
   │   ├── Featured Playlist ✓
-  │   ├── Category Grid (Wind, Fire, Affirmations) ✓
+  │   ├── Category Grid ✓
   │   └── "Get Premium" button (visible to non-subscribers) ✓
   ├── Playlist Detail ✓
   │   ├── Scrollable hero + track list (single unified scroll) ✓
@@ -53,6 +62,8 @@ iPhone Meditation App — Plan
   │   ├── Prev / Play-Pause / Next controls ✓
   │   ├── Loop toggle (loops playlist or stops at end) ✓
   │   └── Trial progress bar (non-subscribers) ✓
+  ├── Mini Player ✓
+  │   └── Shows album artwork (falls back to category icon) ✓
   ├── Paywall Screen ✓
   │   └── Triggered at 10min lifetime, on locked content tap, or "Get Premium" ✓
   └── Settings / Profile — TODO
@@ -67,10 +78,11 @@ iPhone Meditation App — Plan
   - No backend needed — entitlement verified on-device via Transaction.currentEntitlements
   - Offline downloads available to subscribers (files stored in app Documents directory)
   - Track premium status is hardcoded in Playlist.swift — update in code to change
+  - First 2-3 tracks per playlist are free; remaining tracks require subscription
 
   Paywall trigger points:
   1. User hits 10-minute lifetime limit mid-session → soft interrupt with paywall
-  2. User taps a "Premium" tagged track
+  2. User taps a locked track
   3. User taps "Get Premium" button on home screen
 
   ---
@@ -81,13 +93,14 @@ iPhone Meditation App — Plan
   - Animations: Breathing circle on player screen (3-layer pulse, ~4.5s cycle) ✓
   - Onboarding: 3 screens — icon, title, body copy → gold CTA button ✓
   - No clutter: Player screen is nearly empty — visual, track name, and controls only ✓
+  - Album cards show artwork only — no premium badge on albums, lock icon on individual tracks only ✓
 
   ---
   Development Phases
 
   Phase 1 — Core ✓ DONE
   - SwiftUI shell, navigation, audio player with AVFoundation
-  - 4 playlists (Wind & Sky, Fireside, Taylor Welch Affirmations, Biblical Truth Affirmations), CDN URLs as placeholders
+  - 4 playlists, CDN URLs as placeholders
   - 10-minute lifetime trial timer (UserDefaults, survives app restarts)
   - Paywall screen (UI complete, purchase stubbed)
   - Offline download per track (subscribers only)
@@ -95,7 +108,16 @@ iPhone Meditation App — Plan
   - Queue-based playback: Play All, prev/next, loop toggle
   - Unified scrolling playlist detail (hero scrolls with tracks)
 
-  Phase 2 — StoreKit 2 (next)
+  Phase 2 — Audio & CDN ✓ DONE
+  - [x] Convert all WAV files to AAC 192kbps stereo (87 tracks)
+  - [x] Upload to Cloudflare R2, configure public dev domain
+  - [x] Replace placeholder CDN URLs in Playlist.swift with real R2 URLs
+  - [x] Hardcode track durations from ffprobe (shows m:ss in track list)
+  - [x] Add isLoop flag to Track model; loop tracks show "Xm loop"
+  - [x] Mini player shows album artwork instead of category icon
+  - [x] Remove premium badges from album cards (lock stays on individual tracks)
+
+  Phase 3 — StoreKit 2 (next)
   - [ ] Create products in App Store Connect (monthly $4.99 + annual $49.99)
   - [ ] Wire StoreKit 2 purchase flow in PaywallView (replace stub in PaywallView.swift)
   - [ ] Verify entitlement on launch via Transaction.currentEntitlements
@@ -103,10 +125,9 @@ iPhone Meditation App — Plan
   - [ ] Wire "Restore Purchases" button in PaywallView (currently a no-op)
   - [ ] Sandbox testing on device
 
-  Phase 3 — Finish & Ship
+  Phase 4 — Finish & Ship
   - [ ] Sleep timer: implement stop-playback logic in PlayerView (UI already exists)
   - [ ] Settings screen (subscription status, manage/cancel deep link to App Store)
-  - [ ] Upload real audio files to Cloudflare R2, replace placeholder CDN URLs in Playlist.swift
   - [ ] Add background audio in Xcode: Signing & Capabilities → Background Modes → Audio
   - [ ] App Store screenshots + submission
 
@@ -116,7 +137,9 @@ iPhone Meditation App — Plan
   1. Offline downloads for premium? → YES, implemented ✓
   2. No backend for v1 → StoreKit 2 + Apple ID handles cross-device sync ✓
   3. Trial model → 10 minutes lifetime (not per-day), local only ✓
-  4. Track premium status → hardcoded in Playlist.swift for v1, update in code to change ✓
+  4. Track premium status → hardcoded in Playlist.swift for v1 ✓
+  5. Audio format → AAC 192kbps stereo, streamed from Cloudflare R2 ✓
+  6. Durations → hardcoded from ffprobe; catalog is fixed so no need to fetch at runtime ✓
 
   Key Decisions — Open
 
