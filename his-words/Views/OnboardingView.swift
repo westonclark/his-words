@@ -5,9 +5,21 @@ struct OnboardingView: View {
     @State private var page = 0
 
     private let pages: [(icon: String, title: String, body: String)] = [
-        ("leaf.fill",       "Find Your Calm",    "Nature sounds designed to quiet the mind\nand bring you back to the present."),
-        ("headphones",      "Your Daily Refuge",  "Ten minutes a day is all it takes.\nStep away. Breathe. Return restored."),
-        ("sparkles",        "Begin for Free",     "Explore our full library free for 10 minutes.\nNo credit card needed to start."),
+        (
+            "text.bubble.fill",
+            "Rewrite the Script",
+            "Your body is reading a script God didn't write. \nHis Words replaces it with truth."
+        ),
+        (
+            "brain.head.profile",
+            "Backed By Science",
+            "Research has proven that the brain rewires for better when scripture is spoken over it."
+        ),
+        (
+            "waveform",
+            "Voice Activated",
+            "Faith comes by hearing the word of God. Watch your life align with what He says."
+        ),
     ]
 
     var body: some View {
