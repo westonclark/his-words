@@ -130,11 +130,13 @@ private struct FeaturedCard: View {
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             if let name = playlist.imageName {
-                Image(name)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+              Image(name)
+                  .resizable()
+                  .aspectRatio(contentMode: .fill)
+                  .frame(width: UIScreen.main.bounds.width - 40, height: 200) // Explicit width/height
+                  .contentShape(Rectangle()) // Explicitly defines the hit testing area
+                  .clipped()
+                  .clipShape(RoundedRectangle(cornerRadius: 20))
                     .overlay(
                         LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -171,6 +173,7 @@ private struct CategoryCard: View {
                 Image(name)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
+                    .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(
                         LinearGradient(colors: [.clear, .black.opacity(0.7)], startPoint: .top, endPoint: .bottom)
