@@ -21,10 +21,24 @@ struct PlaylistDetailView: View {
                     trackList
                 }
             }
+            .ignoresSafeArea(edges: .top)
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Color.warmBlack, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationBarBackButtonHidden(true)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button { dismiss() } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text("Back")
+                            .font(.system(size: 17))
+                    }
+                    .foregroundColor(.white)
+                }
+            }
+        }
         .sheet(isPresented: $showPlayer) {
             PlayerView()
         }
@@ -32,12 +46,32 @@ struct PlaylistDetailView: View {
 
     private var hero: some View {
         ZStack(alignment: .bottomLeading) {
-            LinearGradient(
-                colors: playlist.category.gradient,
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .frame(height: 240)
+            if let name = playlist.imageName {
+                Image(name)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 360)
+                    .clipped()
+                    .overlay(
+                        LinearGradient(
+                            stops: [
+                                .init(color: .black.opacity(0.55), location: 0),
+                                .init(color: .clear, location: 0.35),
+                                .init(color: .clear, location: 0.55),
+                                .init(color: Color.warmBlack, location: 1.0),
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+            } else {
+                LinearGradient(
+                    colors: playlist.category.gradient,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .frame(height: 360)
+            }
 
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -80,6 +114,7 @@ struct PlaylistDetailView: View {
                     isActive: audio.currentTrack?.id == track.id,
                     isSubscribed: trial.isSubscribed,
                     downloadState: downloadState(for: track),
+                    playlistImageName: playlist.imageName,
                     onTap: { handleTrackTap(track) },
                     onDownload: { handleDownload(track) }
                 )
@@ -136,7 +171,6 @@ struct PlaylistDetailView: View {
                 return (t.id, url)
             }
         )
-        _ = index
         audio.play(playlist: playableTracks, startingAt: startIndex, localURLs: localURLs)
         showPlayer = true
     }
@@ -161,6 +195,7 @@ private struct TrackRow: View {
     let isActive: Bool
     let isSubscribed: Bool
     let downloadState: DownloadState
+    let playlistImageName: String?
     let onTap: () -> Void
     let onDownload: () -> Void
 
@@ -183,17 +218,35 @@ private struct TrackRow: View {
 
     private var thumbnail: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(LinearGradient(
-                    colors: track.category.gradient,
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ))
-                .frame(width: 46, height: 46)
-            Image(systemName: isActive ? "waveform" : track.category.icon)
-                .foregroundColor(.creamWhite.opacity(0.85))
-                .font(.system(size: 16))
-                .symbolEffect(.variableColor.iterative, isActive: isActive)
+            if let name = playlistImageName {
+                Image(name)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 46, height: 46)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(LinearGradient(
+                        colors: track.category.gradient,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ))
+                    .frame(width: 46, height: 46)
+                if !isActive {
+                    Image(systemName: track.category.icon)
+                        .foregroundColor(.creamWhite.opacity(0.85))
+                        .font(.system(size: 16))
+                }
+            }
+            if isActive {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(.black.opacity(0.45))
+                    .frame(width: 46, height: 46)
+                Image(systemName: "waveform")
+                    .foregroundColor(.creamWhite.opacity(0.9))
+                    .font(.system(size: 16))
+                    .symbolEffect(.variableColor.iterative, isActive: true)
+            }
         }
     }
 

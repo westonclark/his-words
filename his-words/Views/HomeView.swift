@@ -129,13 +129,25 @@ private struct FeaturedCard: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(LinearGradient(
-                    colors: playlist.category.gradient,
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ))
-                .frame(height: 200)
+            if let name = playlist.imageName {
+                Image(name)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 200)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .overlay(
+                        LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                    )
+            } else {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(LinearGradient(
+                        colors: playlist.category.gradient,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ))
+                    .frame(height: 200)
+            }
 
             VStack(alignment: .leading, spacing: 4) {
                 if playlist.isPremium {
@@ -158,13 +170,28 @@ private struct CategoryCard: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(LinearGradient(
-                    colors: playlist.category.gradient,
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ))
-                .aspectRatio(1, contentMode: .fit)
+            if let name = playlist.imageName {
+                Image(name)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .overlay(
+                        LinearGradient(colors: [.clear, .black.opacity(0.7)], startPoint: .top, endPoint: .bottom)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                    )
+            } else {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(LinearGradient(
+                        colors: playlist.category.gradient,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ))
+                Image(systemName: playlist.category.icon)
+                    .font(.system(size: 32))
+                    .foregroundColor(.white.opacity(0.15))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .padding(14)
+            }
 
             VStack(alignment: .leading, spacing: 2) {
                 if playlist.isPremium {
@@ -176,13 +203,8 @@ private struct CategoryCard: View {
                     .lineLimit(2)
             }
             .padding(14)
-
-            Image(systemName: playlist.category.icon)
-                .font(.system(size: 32))
-                .foregroundColor(.white.opacity(0.15))
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-                .padding(14)
         }
+        .aspectRatio(1, contentMode: .fit)
     }
 }
 
