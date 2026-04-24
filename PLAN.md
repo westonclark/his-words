@@ -57,13 +57,12 @@ iPhone Meditation App — Plan
   │   ├── "Play All" button — starts full queue from track 1 ✓
   │   └── Per-track download button (subscribers only) ✓
   ├── Player Screen ✓
-  │   ├── Breathing circle animation ✓
   │   ├── Now Playing + track name + "X of Y" queue position ✓
   │   ├── Prev / Play-Pause / Next controls ✓
   │   ├── Loop toggle (loops playlist or stops at end) ✓
   │   └── Trial progress bar (non-subscribers) ✓
   ├── Mini Player ✓
-  │   └── Shows album artwork (falls back to category icon) ✓
+  │   └── Shows album artwork ✓
   ├── Paywall Screen ✓
   │   └── Triggered at 10min lifetime, on locked content tap, or "Get Premium" ✓
   └── Settings / Profile — TODO
@@ -88,9 +87,8 @@ iPhone Meditation App — Plan
   ---
   Design Direction (Calm/Headspace inspired)
 
-  - Color palette: Deep navy background, soft cream (#f0efea) text, muted gold accents ✓
+  - Color palette: Deep gray background, soft cream (#f0efea) text, muted gold accents ✓
   - Typography: Serif headings + rounded sans body (system fonts) ✓
-  - Animations: Breathing circle on player screen (3-layer pulse, ~4.5s cycle) ✓
   - Onboarding: 3 screens — icon, title, body copy → gold CTA button ✓
   - No clutter: Player screen is nearly empty — visual, track name, and controls only ✓
   - Album cards show artwork only — no premium badge on albums, lock icon on individual tracks only ✓
@@ -99,14 +97,14 @@ iPhone Meditation App — Plan
   Development Phases
 
   Phase 1 — Core ✓ DONE
-  - SwiftUI shell, navigation, audio player with AVFoundation
-  - 4 playlists, CDN URLs as placeholders
-  - 10-minute lifetime trial timer (UserDefaults, survives app restarts)
-  - Paywall screen (UI complete, purchase stubbed)
-  - Offline download per track (subscribers only)
-  - Breathing animation, mini-player, onboarding
-  - Queue-based playback: Play All, prev/next, loop toggle
-  - Unified scrolling playlist detail (hero scrolls with tracks)
+  - [x] SwiftUI shell, navigation, audio player with AVFoundation
+  - [x] 4 playlists, CDN URLs as placeholders
+  - [x] 10-minute lifetime trial timer (UserDefaults, survives app restarts)
+  - [x] Paywall screen (UI complete, purchase stubbed)
+  - [x] Offline download per track (subscribers only)
+  - [x] Breathing animation, mini-player, onboarding
+  - [x] Queue-based playback: Play All, prev/next, loop toggle
+  - [x] Unified scrolling playlist detail (hero scrolls with tracks)
 
   Phase 2 — Audio & CDN ✓ DONE
   - [x] Convert all WAV files to AAC 192kbps stereo (87 tracks)
@@ -126,7 +124,6 @@ iPhone Meditation App — Plan
   - [ ] Sandbox testing on device
 
   Phase 4 — Finish & Ship
-  - [ ] Settings screen (subscription status, manage/cancel deep link to App Store)
   - [x] Add background audio in Xcode: Signing & Capabilities → Background Modes → Audio
   - [ ] App Store screenshots + submission
 
@@ -139,8 +136,3 @@ iPhone Meditation App — Plan
   4. Track premium status → hardcoded in Playlist.swift for v1 ✓
   5. Audio format → AAC 192kbps stereo, streamed from Cloudflare R2 ✓
   6. Durations → hardcoded from ffprobe; catalog is fixed so no need to fetch at runtime ✓
-
-  Key Decisions — Open
-
-  1. Blending two sounds (rain + fire)? Calm does this — high retention feature, moderate effort
-  2. Guided meditations (voice)? Out of scope for v1 but plan the content structure for it
