@@ -1,24 +1,24 @@
-//
-//  ContentView.swift
-//  his-words
-//
-//  Created by Weston Clark on 4/17/26.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var appState: AppState
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            if appState.isOnboardingComplete {
+                HomeView()
+            } else {
+                OnboardingView()
+            }
         }
-        .padding()
+        .animation(.easeInOut(duration: 0.4), value: appState.isOnboardingComplete)
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(AppState())
+        .environmentObject(AudioPlayerService())
+        .environmentObject(TrialService())
+        .environmentObject(DownloadService())
 }

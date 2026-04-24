@@ -1,0 +1,200 @@
+import SwiftUI
+
+struct HomeView: View {
+    @EnvironmentObject var audio: AudioPlayerService
+    @EnvironmentObject var trial: TrialService
+    @EnvironmentObject var appState: AppState
+
+    @State private var selectedPlaylist: Playlist?
+    @State private var showPlayer = false
+
+    private let playlists = Playlist.catalog
+
+    var body: some View {
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                Color.warmBlack.ignoresSafeArea()
+
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 32) {
+                        header
+
+                        featuredSection
+
+                        categorySection
+                    }
+                    .padding(.bottom, audio.currentTrack != nil ? 100 : 32)
+                }
+
+                if audio.currentTrack != nil {
+                    VStack(spacing: 0) {
+                        MiniPlayerView { showPlayer = true }
+                        Color.clear.frame(height: 16)
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .navigationDestination(for: Playlist.self) { playlist in
+                PlaylistDetailView(playlist: playlist)
+            }
+        }
+        .sheet(isPresented: $showPlayer) {
+            PlayerView()
+        }
+        .sheet(isPresented: $appState.showPaywall) {
+            PaywallView()
+        }
+        .onChange(of: trial.hasExhaustedTrial) { _, exhausted in
+            if exhausted { appState.showPaywall = true }
+        }
+    }
+
+    private var header: some View {
+        HStack(alignment: .bottom) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("His Words")
+                    .font(.system(size: 32, weight: .semibold, design: .serif))
+                    .foregroundColor(.creamWhite)
+                Text("Daily Biblical Affirmations")
+                    .font(.system(size: 15, design: .rounded))
+                    .foregroundColor(.mutedCream)
+            }
+
+            Spacer()
+
+            if !trial.isSubscribed {
+                Button {
+                    appState.showPaywall = true
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 11, weight: .semibold))
+                        Text("Get Premium")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundColor(.warmBlack)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Color.mutedGold)
+                    .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+    }
+
+    private var featuredSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionLabel("Featured")
+
+            NavigationLink(value: Playlist.featured) {
+                FeaturedCard(playlist: Playlist.featured)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 20)
+        }
+    }
+
+    private var categorySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionLabel("Explore")
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                ForEach(playlists) { playlist in
+                    NavigationLink(value: playlist) {
+                        CategoryCard(playlist: playlist)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+    }
+
+    private func sectionLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 13, weight: .semibold, design: .rounded))
+            .foregroundColor(.mutedCream)
+            .tracking(1.5)
+            .textCase(.uppercase)
+            .padding(.horizontal, 20)
+    }
+}
+
+// MARK: – Cards
+
+private struct FeaturedCard: View {
+    let playlist: Playlist
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(LinearGradient(
+                    colors: playlist.category.gradient,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ))
+                .frame(height: 200)
+
+            VStack(alignment: .leading, spacing: 4) {
+                if playlist.isPremium {
+                    PremiumBadge()
+                }
+                Text(playlist.title)
+                    .font(.system(size: 24, weight: .semibold, design: .serif))
+                    .foregroundColor(.creamWhite)
+                Text(playlist.subtitle)
+                    .font(.system(size: 14, design: .rounded))
+                    .foregroundColor(.creamWhite.opacity(0.75))
+            }
+            .padding(20)
+        }
+    }
+}
+
+private struct CategoryCard: View {
+    let playlist: Playlist
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(LinearGradient(
+                    colors: playlist.category.gradient,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ))
+                .aspectRatio(1, contentMode: .fit)
+
+            VStack(alignment: .leading, spacing: 2) {
+                if playlist.isPremium {
+                    PremiumBadge()
+                }
+                Text(playlist.title)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundColor(.creamWhite)
+                    .lineLimit(2)
+            }
+            .padding(14)
+
+            Image(systemName: playlist.category.icon)
+                .font(.system(size: 32))
+                .foregroundColor(.white.opacity(0.15))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                .padding(14)
+        }
+    }
+}
+
+private struct PremiumBadge: View {
+    var body: some View {
+        Text("PREMIUM")
+            .font(.system(size: 9, weight: .bold, design: .rounded))
+            .foregroundColor(.mutedGold)
+            .tracking(1.2)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(Color.black.opacity(0.35))
+            .clipShape(Capsule())
+    }
+}
