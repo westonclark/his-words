@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class TrialService: ObservableObject {
     static let freeLimit: TimeInterval = 10 * 60  // 10 minutes lifetime free trial
 
@@ -21,9 +22,11 @@ final class TrialService: ObservableObject {
     private var previousAudioTotal: TimeInterval = 0
 
     private static let secondsKey = "trial_seconds_used"
+    private static let subscriptionKey = "subscription_status"
 
     init() {
         usedSeconds = UserDefaults.standard.double(forKey: Self.secondsKey)
+        isSubscribed = UserDefaults.standard.bool(forKey: Self.subscriptionKey)
     }
 
     func observe(_ audioService: AudioPlayerService) {
@@ -45,6 +48,18 @@ final class TrialService: ObservableObject {
     // Called after StoreKit purchase confirms entitlement.
     func grantSubscription() {
         isSubscribed = true
+        UserDefaults.standard.set(true, forKey: Self.subscriptionKey)
+    }
+
+    // Sync subscription status from StoreKit entitlements.
+    @MainActor
+    func syncSubscriptionStatus(from storeKit: StoreKitManager) {
+        let hasEntitlement = !storeKit.purchasedProductIDs.isEmpty
+        if hasEntitlement {
+            isSubscribed = true
+            UserDefaults.standard.set(true, forKey: Self.subscriptionKey)
+        } else {
+        }
     }
 
 }

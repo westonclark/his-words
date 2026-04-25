@@ -6,6 +6,7 @@ struct his_wordsApp: App {
     @StateObject private var audio     = AudioPlayerService()
     @StateObject private var trial     = TrialService()
     @StateObject private var downloads = DownloadService()
+    @StateObject private var storeKit  = StoreKitManager()
 
     var body: some Scene {
         WindowGroup {
@@ -14,7 +15,11 @@ struct his_wordsApp: App {
                 .environmentObject(audio)
                 .environmentObject(trial)
                 .environmentObject(downloads)
-                .onAppear { trial.observe(audio) }
+                .environmentObject(storeKit)
+                .onAppear {
+                    trial.observe(audio)
+                    trial.syncSubscriptionStatus(from: storeKit)
+                }
                 .preferredColorScheme(.dark)
         }
     }

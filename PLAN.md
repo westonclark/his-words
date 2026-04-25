@@ -113,18 +113,43 @@ iPhone Meditation App — Plan
   - [x] Mini player shows album artwork instead of category icon
   - [x] Remove premium badges from album cards (lock stays on individual tracks)
 
-  Phase 3 — StoreKit 2 (next)
-  - [ ] Create products in App Store Connect (monthly $4.99 + annual $49.99)
-  - [ ] Wire StoreKit 2 purchase flow in PaywallView (replace stub in PaywallView.swift)
-  - [ ] Verify entitlement on launch via Transaction.currentEntitlements
-  - [ ] Handle subscription expiry / renewal
+  Phase 3 — StoreKit 2 ✓ DONE (local testing complete)
+  - [x] Create local StoreKit configuration file (his-words.storekit) with test products
+  - [x] Wire StoreKit 2 purchase flow in PaywallView (real purchase with verification)
+  - [x] Verify entitlement on launch via Transaction.currentEntitlements
+  - [x] Cache subscription status in UserDefaults (persists across app restarts)
   - [x] Add a "Manage Your Subscription" button to the UI
-  - [ ] Wire "Restore Purchases" button in PaywallView (currently a no-op)
-  - [ ] Sandbox testing on device
+  - [x] Wire "Restore Purchases" button in PaywallView (calls AppStore.sync())
+  - [x] Local sandbox testing on simulator
 
-  Phase 4 — Finish & Ship
+  Phase 4 — App Store Submission
   - [x] Add background audio in Xcode: Signing & Capabilities → Background Modes → Audio
-  - [ ] App Store screenshots + submission
+  - [ ] Create app in App Store Connect
+  - [ ] Set Bundle ID in Xcode (must match App Store Connect)
+  - [ ] Create subscription products in App Store Connect (com.hiswords.monthly + com.hiswords.annual)
+  - [ ] Configure In-App Purchase entitlements in Xcode
+  - [ ] Add app icon (1024x1024 required for App Store)
+  - [ ] Add launch screen or splash image
+  - [ ] Set iOS minimum version + supported devices (portrait orientation)
+  - [ ] Write app description, keywords, support email
+  - [ ] Create App Store screenshots (6.5" iPhone Pro recommended)
+  - [ ] Add privacy policy URL
+  - [ ] Add age rating questionnaire
+  - [ ] Test on real device + TestFlight
+  - [ ] Submit to App Review
+
+  ---
+  TestFlight Testing Checklist
+
+  When testing on TestFlight, verify:
+  - [ ] Purchase monthly subscription → paywall closes, app unlocked
+  - [ ] Purchase annual subscription → paywall closes, app unlocked
+  - [ ] Delete and reinstall app → Restore Purchases finds subscription (should work on real device, not Xcode sandbox)
+  - [ ] Tap "Manage Subscription" → Opens Apple Settings app to subscription management
+  - [ ] Trial timer works (10 min lifetime, shows progress bar)
+  - [ ] Download tracks while subscribed (stores in Documents)
+  - [ ] Play downloaded tracks offline
+  - [ ] Subscription syncs across multiple devices via Apple ID
 
   ---
   Key Decisions — Resolved

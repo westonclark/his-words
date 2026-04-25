@@ -6,7 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7F0458BA2F9C89610049EE6C /* his-words.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 7F0458B92F9C89610049EE6C /* his-words.storekit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		7F0458B92F9C89610049EE6C /* his-words.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = "his-words.storekit"; path = "his-words/his-words.storekit"; sourceTree = "<group>"; };
+		7F0458BB2F9C8A870049EE6C /* his-words.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = "his-words.storekit"; path = "his-words/his-words.storekit"; sourceTree = "<group>"; };
 		7F5EA8C12F92C76000AF3963 /* his-words.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "his-words.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -14,6 +20,7 @@
 		7F5EA8F12F92C9E400AF3963 /* Exceptions for "his-words" folder in "his-words" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"his-words.storekit",
 				Info.plist,
 			);
 			target = 7F5EA8C02F92C76000AF3963 /* his-words */;
@@ -45,6 +52,8 @@
 		7F5EA8B82F92C76000AF3963 = {
 			isa = PBXGroup;
 			children = (
+				7F0458B92F9C89610049EE6C /* his-words.storekit */,
+				7F0458BB2F9C8A870049EE6C /* his-words.storekit */,
 				7F5EA8C32F92C76000AF3963 /* his-words */,
 				7F5EA8C22F92C76000AF3963 /* Products */,
 			);
@@ -122,6 +131,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F0458BA2F9C89610049EE6C /* his-words.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

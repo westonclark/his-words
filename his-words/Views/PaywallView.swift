@@ -1,11 +1,14 @@
 import SwiftUI
+import StoreKit
 
 struct PaywallView: View {
     @EnvironmentObject var trial: TrialService
     @EnvironmentObject var appState: AppState
+    @StateObject private var storeKit = StoreKitManager()
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedPlan: Plan = .annual
+    @State private var isPurchasing = false
 
     enum Plan { case monthly, annual }
 
@@ -104,10 +107,19 @@ struct PaywallView: View {
 
     private var subscribeButton: some View {
         Button {
-            // TODO: StoreKit 2 purchase call goes here
-            trial.grantSubscription()
-            appState.showPaywall = false
-            dismiss()
+            isPurchasing = true
+            Task {
+                let productID = selectedPlan == .annual ? "com.hiswords.annual" : "com.hiswords.monthly"
+                if let product = storeKit.products.first(where: { $0.id == productID }) {
+                    let success = await storeKit.purchase(product)
+                    if success {
+                        trial.grantSubscription()
+                        appState.showPaywall = false
+                        dismiss()
+                    }
+                }
+                isPurchasing = false
+            }
         } label: {
             VStack(spacing: 2) {
                 Text(selectedPlan == .annual ? "Subscribe Annually" : "Subscribe Monthly")
@@ -119,14 +131,22 @@ struct PaywallView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 60)
-            .background(Color.mutedGold)
+            .background(isPurchasing ? Color.mutedGold.opacity(0.7) : Color.mutedGold)
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
+        .disabled(storeKit.isLoading || isPurchasing || storeKit.products.isEmpty)
     }
 
     private var restoreButton: some View {
         Button {
-            // TODO: StoreKit 2 restore purchases
+            Task {
+                await storeKit.restorePurchases()
+                trial.syncSubscriptionStatus(from: storeKit)
+                if trial.isSubscribed {
+                    appState.showPaywall = false
+                    dismiss()
+                }
+            }
         } label: {
             Text("Restore Purchases")
                 .font(.system(size: 14, design: .rounded))
