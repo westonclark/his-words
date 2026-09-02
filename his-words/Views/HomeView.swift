@@ -6,15 +6,16 @@ struct HomeView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.openURL) private var openURL
 
-    @State private var selectedPlaylist: Playlist?
     @State private var showPlayer = false
 
-    private let playlists = Playlist.catalog
+    private var exploreTopics: [Topic] {
+        Topic.allCases
+    }
 
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottom) {
-                Color.warmBlack.ignoresSafeArea()
+            ZStack {
+                AppBackground()
 
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 32) {
@@ -22,23 +23,42 @@ struct HomeView: View {
 
                         featuredSection
 
-                        categorySection
+                        topicSection
                     }
                     .padding(.bottom, audio.currentTrack != nil ? 100 : 32)
                 }
-
-                if audio.currentTrack != nil {
-                    VStack(spacing: 0) {
-                        MiniPlayerView { showPlayer = true }
-                        Color.clear.frame(height: 16)
-                    }
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
             }
-            .navigationDestination(for: Playlist.self) { playlist in
-                PlaylistDetailView(playlist: playlist)
+            .navigationDestination(for: Topic.self) { topic in
+                AmbienceSelectionView(topic: topic)
             }
         }
+        // Sits outside the stack so it stays put across pushes.
+        .overlay(alignment: .bottom) {
+            if audio.currentTrack != nil {
+                VStack(spacing: 0) {
+                    MiniPlayerView { showPlayer = true }
+                    Color.clear.frame(height: 16)
+                }
+                // Content dissolves into the dark instead of being cut by an edge.
+                .background {
+                    LinearGradient(
+                        stops: [
+                            .init(color: .clear,                   location: 0.0),
+                            .init(color: .warmBlack.opacity(0.72), location: 0.45),
+                            .init(color: .warmBlack,               location: 1.0),
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 190)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .ignoresSafeArea(edges: .bottom)
+                    .allowsHitTesting(false)
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: audio.currentTrack != nil)
         .sheet(isPresented: $showPlayer) {
             PlayerView()
         }
@@ -105,24 +125,28 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionLabel("Featured")
 
-            NavigationLink(value: Playlist.featured) {
-                FeaturedCard(playlist: Playlist.featured)
+            NavigationLink(value: Topic.featured) {
+                FeaturedTopicCard(topic: .featured)
             }
             .buttonStyle(.plain)
             .padding(.horizontal, 20)
         }
     }
 
-    private var categorySection: some View {
+    private var topicSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionLabel("Explore")
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(playlists) { playlist in
-                    NavigationLink(value: playlist) {
-                        CategoryCard(playlist: playlist)
+                ForEach(exploreTopics) { topic in
+                    if topic.isAvailable {
+                        NavigationLink(value: topic) {
+                            TopicCard(topic: topic)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        TopicCard(topic: topic)
                     }
-                    .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, 20)
@@ -141,38 +165,34 @@ struct HomeView: View {
 
 // MARK: – Cards
 
-private struct FeaturedCard: View {
-    let playlist: Playlist
+private struct FeaturedTopicCard: View {
+    let topic: Topic
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            if let name = playlist.imageName {
-              Image(name)
-                  .resizable()
-                  .aspectRatio(contentMode: .fill)
-                  .frame(width: UIScreen.main.bounds.width - 40, height: 200) // Explicit width/height
-                  .contentShape(Rectangle()) // Explicitly defines the hit testing area
-                  .clipped()
-                  .clipShape(RoundedRectangle(cornerRadius: 20))
+            if let name = topic.imageName {
+                Image(name)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: UIScreen.main.bounds.width - 40, height: 200)
+                    .contentShape(Rectangle())
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
                     .overlay(
                         LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                     )
             } else {
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(LinearGradient(
-                        colors: playlist.category.gradient,
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ))
+                    .fill(Color.charcoal)
                     .frame(height: 200)
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(playlist.title)
+                Text(topic.title)
                     .font(.system(size: 24, weight: .semibold, design: .serif))
                     .foregroundColor(.creamWhite)
-                Text(playlist.subtitle)
+                Text(topic.subtitle)
                     .font(.system(size: 14, design: .rounded))
                     .foregroundColor(.creamWhite.opacity(0.75))
             }
@@ -181,53 +201,53 @@ private struct FeaturedCard: View {
     }
 }
 
-private struct CategoryCard: View {
-    let playlist: Playlist
+private struct TopicCard: View {
+    let topic: Topic
 
     var body: some View {
         Color.clear
             .aspectRatio(1, contentMode: .fit)
             .overlay {
-                if let name = playlist.imageName {
+                if let name = topic.imageName {
                     Image(name)
                         .resizable()
                         .scaledToFill()
                 } else {
                     LinearGradient(
-                        colors: playlist.category.gradient,
+                        colors: [Color.charcoal, Color.darkCharcoal],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
-                    Image(systemName: playlist.category.icon)
-                        .font(.system(size: 32))
-                        .foregroundColor(.white.opacity(0.15))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-                        .padding(14)
+                    Image(systemName: topic.icon)
+                        .font(.system(size: 34))
+                        .foregroundColor(.creamWhite.opacity(0.22))
                 }
             }
             .overlay(
                 LinearGradient(colors: [.clear, .black.opacity(0.7)], startPoint: .top, endPoint: .bottom)
             )
+            .overlay(alignment: .topTrailing) {
+                if !topic.isAvailable {
+                    Text("Coming Soon")
+                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .foregroundColor(.mutedGold)
+                        .tracking(1.1)
+                        .textCase(.uppercase)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 4)
+                        .background(Color.black.opacity(0.45))
+                        .clipShape(Capsule())
+                        .padding(10)
+                }
+            }
             .overlay(alignment: .bottomLeading) {
-                Text(playlist.title)
+                Text(topic.title)
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundColor(.creamWhite)
                     .lineLimit(2)
                     .padding(14)
             }
             .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-}
-
-private struct PremiumBadge: View {
-    var body: some View {
-        Text("PREMIUM")
-            .font(.system(size: 9, weight: .bold, design: .rounded))
-            .foregroundColor(.mutedGold)
-            .tracking(1.2)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(Color.black.opacity(0.35))
-            .clipShape(Capsule())
+            .opacity(topic.isAvailable ? 1 : 0.55)
     }
 }

@@ -30,7 +30,7 @@ struct MiniPlayerView: View {
                         }
                         if audio.isPlaying {
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(.black.opacity(0.45))
+                                .fill(.black.opacity(0.28))
                                 .frame(width: 44, height: 44)
                             Image(systemName: "waveform")
                                 .foregroundColor(.creamWhite.opacity(0.9))
@@ -43,7 +43,7 @@ struct MiniPlayerView: View {
                         Text(track.title)
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
                             .foregroundColor(.creamWhite)
-                        Text(track.category.displayName)
+                        Text(track.verse ?? track.category.displayName)
                             .font(.system(size: 12, design: .rounded))
                             .foregroundColor(.mutedCream)
                     }
@@ -62,10 +62,14 @@ struct MiniPlayerView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.charcoal)
-                        .shadow(color: .black.opacity(0.4), radius: 12, y: 4)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(.ultraThinMaterial)
                 )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(Color.creamWhite.opacity(0.10), lineWidth: 1)
+                )
+                .environment(\.colorScheme, .dark)
                 .padding(.horizontal, 12)
             }
             .buttonStyle(.plain)

@@ -17,8 +17,11 @@ struct his_wordsApp: App {
                 .environmentObject(downloads)
                 .environmentObject(storeKit)
                 .onAppear {
+                    audio.localURLProvider = { [weak downloads] track in
+                        downloads?.localURL(for: track)
+                    }
                     trial.observe(audio)
-                    trial.syncSubscriptionStatus(from: storeKit)
+                    trial.observeSubscriptionStatus(from: storeKit)
                 }
                 .preferredColorScheme(.dark)
         }

@@ -4,7 +4,7 @@ import StoreKit
 struct PaywallView: View {
     @EnvironmentObject var trial: TrialService
     @EnvironmentObject var appState: AppState
-    @StateObject private var storeKit = StoreKitManager()
+    @EnvironmentObject var storeKit: StoreKitManager
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedPlan: Plan = .annual

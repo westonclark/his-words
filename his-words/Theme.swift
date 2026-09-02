@@ -9,3 +9,21 @@ extension Color {
     static let mutedGold    = Color(red: 0.75,  green: 0.62,  blue: 0.35)   // unchanged
     static let forestGreen  = Color(red: 0.12,  green: 0.42,  blue: 0.28)   // unchanged
 }
+
+/// The app's ground. Warm near-black with a faint lift at the top and a
+/// deepening toward the bottom, so the screen reads as a dim room rather than
+/// a flat void — without competing with the photography it sits behind.
+struct AppBackground: View {
+    var body: some View {
+        LinearGradient(
+            stops: [
+                .init(color: Color(red: 0.086, green: 0.084, blue: 0.078), location: 0.0),
+                .init(color: .warmBlack,                                   location: 0.42),
+                .init(color: Color(red: 0.051, green: 0.050, blue: 0.047), location: 1.0),
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea()
+    }
+}

@@ -40,8 +40,11 @@ final class DownloadService: ObservableObject {
                 self.activeTasks.removeValue(forKey: track.id)
 
                 guard let tempURL, error == nil else { return }
-                let dest = self.fileURL(for: track)
+                var dest = self.fileURL(for: track)
                 try? FileManager.default.moveItem(at: tempURL, to: dest)
+                var excluded = URLResourceValues()
+                excluded.isExcludedFromBackup = true
+                try? dest.setResourceValues(excluded)
                 self.downloadedIDs.insert(track.id)
             }
         }
@@ -62,7 +65,7 @@ final class DownloadService: ObservableObject {
     private func fileURL(for track: Track) -> URL {
         FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("\(track.id.uuidString).aac")
+            .appendingPathComponent("\(track.id.uuidString).m4a")
     }
 
     private func scanDisk() {
@@ -72,7 +75,7 @@ final class DownloadService: ObservableObject {
         ) else { return }
         downloadedIDs = Set(
             contents.compactMap { url -> UUID? in
-                guard url.pathExtension == "aac" else { return nil }
+                guard url.pathExtension == "m4a" else { return nil }
                 return UUID(uuidString: url.deletingPathExtension().lastPathComponent)
             }
         )

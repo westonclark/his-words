@@ -19,6 +19,7 @@ final class TrialService: ObservableObject {
     @Published private(set) var usedSeconds: TimeInterval = 0
 
     private var cancellable: AnyCancellable?
+    private var storeKitCancellable: AnyCancellable?
     private var previousAudioTotal: TimeInterval = 0
 
     private static let secondsKey = "trial_seconds_used"
@@ -55,11 +56,18 @@ final class TrialService: ObservableObject {
     @MainActor
     func syncSubscriptionStatus(from storeKit: StoreKitManager) {
         let hasEntitlement = !storeKit.purchasedProductIDs.isEmpty
-        if hasEntitlement {
-            isSubscribed = true
-            UserDefaults.standard.set(true, forKey: Self.subscriptionKey)
-        } else {
-        }
+        isSubscribed = hasEntitlement
+        UserDefaults.standard.set(hasEntitlement, forKey: Self.subscriptionKey)
+    }
+
+    /// Keeps subscription status current as StoreKit's entitlement fetch
+    /// resolves (it starts empty and updates asynchronously after launch).
+    func observeSubscriptionStatus(from storeKit: StoreKitManager) {
+        storeKitCancellable = storeKit.$purchasedProductIDs
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.syncSubscriptionStatus(from: storeKit)
+            }
     }
 
 }

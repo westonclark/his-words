@@ -3,14 +3,16 @@ import SwiftUI
 struct Track: Identifiable, Codable, Hashable {
     let id: UUID
     let title: String
+    /// Scripture reference shown under the title, e.g. "Romans 5:17".
+    let verse: String?
     let category: Category
     let duration: TimeInterval
     let streamURL: String
     let isPremium: Bool
     let isLoop: Bool
 
-    init(id: UUID, title: String, category: Category, duration: TimeInterval, streamURL: String, isPremium: Bool, isLoop: Bool = false) {
-        self.id = id; self.title = title; self.category = category
+    init(id: UUID, title: String, verse: String? = nil, category: Category, duration: TimeInterval, streamURL: String, isPremium: Bool, isLoop: Bool = false) {
+        self.id = id; self.title = title; self.verse = verse; self.category = category
         self.duration = duration; self.streamURL = streamURL
         self.isPremium = isPremium; self.isLoop = isLoop
     }
