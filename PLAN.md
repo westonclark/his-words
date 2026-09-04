@@ -150,7 +150,7 @@ App
 Subscription Model
 
 - Free tier: 10 cumulative minutes lifetime (tracked locally, never resets)
-- Premium: $4.99/month or $49.99/year (2 months free vs monthly — ~17% off)
+- Premium: $17.99/month or $119.99/year ($9.99/month equivalent — ~44% off vs monthly)
 - StoreKit 2 handles everything: purchases, restores, family sharing, cross-device sync via Apple ID
 - No backend needed — entitlement verified on-device via Transaction.currentEntitlements
 - Offline downloads available to subscribers (files stored in app Documents directory)

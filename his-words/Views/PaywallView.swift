@@ -89,7 +89,7 @@ struct PaywallView: View {
         HStack(spacing: 12) {
             PlanCard(
                 title: "Monthly",
-                price: "$4.99",
+                price: "$17.99",
                 period: "per month",
                 badge: nil,
                 isSelected: selectedPlan == .monthly
@@ -97,9 +97,9 @@ struct PaywallView: View {
 
             PlanCard(
                 title: "Annual",
-                price: "$49.99",
-                period: "per year",
-                badge: "2 MONTHS FREE",
+                price: "$9.99",
+                period: "per month",
+                badge: "SAVE 44%",
                 isSelected: selectedPlan == .annual
             ) { selectedPlan = .annual }
         }
@@ -125,7 +125,7 @@ struct PaywallView: View {
                 Text(selectedPlan == .annual ? "Subscribe Annually" : "Subscribe Monthly")
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .foregroundColor(.warmBlack)
-                Text(selectedPlan == .annual ? "$49.99/year — 2 months free" : "$4.99/month, cancel anytime")
+                Text(selectedPlan == .annual ? "$119.99/year, billed annually" : "$17.99/month, cancel anytime")
                     .font(.system(size: 12, design: .rounded))
                     .foregroundColor(.warmBlack.opacity(0.65))
             }
