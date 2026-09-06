@@ -37,15 +37,19 @@ struct PlayerView: View {
             }
 
             VStack(spacing: 0) {
-                dragHandle
+                VStack(spacing: 0) {
+                    dragHandle
 
-                Spacer()
+                    Spacer()
 
-                if let track = audio.currentTrack {
-                    trackInfo(track: track)
+                    if let track = audio.currentTrack {
+                        trackInfo(track: track)
+                    }
+
+                    Spacer()
                 }
-
-                Spacer()
+                .contentShape(Rectangle())
+                .gesture(dismissDrag)
 
                 if let context = audio.context, context.topic.hasVoiceOptions {
                     voiceOptions(context: context)
@@ -93,20 +97,20 @@ struct PlayerView: View {
             .frame(width: 36, height: 5)
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture()
-                    .onChanged { value in
-                        dragOffset = max(0, value.translation.height)
-                    }
-                    .onEnded { value in
-                        if value.translation.height > dismissThreshold {
-                            dismiss()
-                        } else {
-                            dragOffset = 0
-                        }
-                    }
-            )
+    }
+
+    private var dismissDrag: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                dragOffset = max(0, value.translation.height)
+            }
+            .onEnded { value in
+                if value.translation.height > dismissThreshold {
+                    dismiss()
+                } else {
+                    dragOffset = 0
+                }
+            }
     }
 
     private func trackInfo(track: Track) -> some View {
