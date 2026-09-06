@@ -59,7 +59,7 @@ struct HomeView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: audio.currentTrack != nil)
-        .sheet(isPresented: $showPlayer) {
+        .fullScreenCover(isPresented: $showPlayer) {
             PlayerView()
         }
         .sheet(isPresented: $appState.showPaywall) {

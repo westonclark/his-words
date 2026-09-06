@@ -5,6 +5,9 @@ struct PlayerView: View {
     @EnvironmentObject var trial: TrialService
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
+    @State private var dragOffset: CGFloat = 0
+
+    private let dismissThreshold: CGFloat = 140
 
     var body: some View {
         ZStack {
@@ -56,6 +59,8 @@ struct PlayerView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 24)
         }
+        .offset(y: dragOffset)
+        .animation(.interactiveSpring(), value: dragOffset)
         .onChange(of: trial.hasExhaustedTrial) { _, exhausted in
             if exhausted {
                 audio.pause()
@@ -86,8 +91,22 @@ struct PlayerView: View {
         RoundedRectangle(cornerRadius: 3)
             .fill(Color.creamWhite.opacity(0.25))
             .frame(width: 36, height: 5)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        dragOffset = max(0, value.translation.height)
+                    }
+                    .onEnded { value in
+                        if value.translation.height > dismissThreshold {
+                            dismiss()
+                        } else {
+                            dragOffset = 0
+                        }
+                    }
+            )
     }
 
     private func trackInfo(track: Track) -> some View {

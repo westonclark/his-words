@@ -43,7 +43,7 @@ struct AmbienceSelectionView: View {
                 }
             }
         }
-        .sheet(isPresented: $showPlayer) {
+        .fullScreenCover(isPresented: $showPlayer) {
             PlayerView()
         }
     }
