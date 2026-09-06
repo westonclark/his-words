@@ -1,5 +1,7 @@
 import AVFoundation
 import Combine
+import MediaPlayer
+import UIKit
 
 /// Playback runs on a single long-lived `AVQueuePlayer`. The whole remaining
 /// playlist is enqueued up front so AVFoundation buffers the next track while
@@ -56,6 +58,7 @@ final class AudioPlayerService: ObservableObject {
         player.actionAtItemEnd = .advance
         observeCurrentItem()
         observeTime()
+        configureRemoteCommands()
     }
 
     deinit {
@@ -112,11 +115,13 @@ final class AudioPlayerService: ObservableObject {
         }
         if isPlaying { player.pause() } else { player.play() }
         isPlaying.toggle()
+        updateNowPlayingInfo()
     }
 
     func pause() {
         player.pause()
         isPlaying = false
+        updateNowPlayingInfo()
     }
 
     func toggleLoop() {
@@ -153,6 +158,7 @@ final class AudioPlayerService: ObservableObject {
         currentPlaylistImageName = nil
         currentTrack = nil
         context = nil
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
 
     /// Moves the thumb without seeking — called continuously during a drag.
@@ -170,6 +176,7 @@ final class AudioPlayerService: ObservableObject {
             toleranceAfter: .zero
         ) { [weak self] _ in
             self?.isScrubbing = false
+            self?.updateNowPlayingInfo()
         }
     }
 
@@ -226,6 +233,7 @@ final class AudioPlayerService: ObservableObject {
 
         player.play()
         isPlaying = true
+        updateNowPlayingInfo()
     }
 
     private func clearQueue() {
@@ -287,6 +295,7 @@ final class AudioPlayerService: ObservableObject {
         currentTrack = currentPlaylist[index]
         playbackTime = 0
         playbackDuration = 0
+        updateNowPlayingInfo()
     }
 
     private func observeTime() {
@@ -304,7 +313,58 @@ final class AudioPlayerService: ObservableObject {
             let length = self.player.currentItem?.duration.seconds ?? .nan
             if length.isFinite, length > 0, self.playbackDuration != length {
                 self.playbackDuration = length
+                self.updateNowPlayingInfo()
             }
         }
+    }
+
+    // MARK: – Control Center / Lock Screen
+
+    private func configureRemoteCommands() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+
+        commandCenter.playCommand.addTarget { [weak self] _ in
+            guard let self, self.player.currentItem != nil else { return .noSuchContent }
+            if !self.isPlaying { self.togglePlayPause() }
+            return .success
+        }
+        commandCenter.pauseCommand.addTarget { [weak self] _ in
+            guard let self, self.isPlaying else { return .commandFailed }
+            self.pause()
+            return .success
+        }
+        commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
+            self?.togglePlayPause()
+            return .success
+        }
+        commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+            self?.next()
+            return .success
+        }
+        commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+            self?.previous()
+            return .success
+        }
+    }
+
+    private func updateNowPlayingInfo() {
+        guard currentTrack != nil else {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+            return
+        }
+
+        var info: [String: Any] = [
+            MPMediaItemPropertyTitle: currentTrack?.title ?? "His Words",
+            MPMediaItemPropertyPlaybackDuration: playbackDuration,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: playbackTime,
+            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0,
+        ]
+        if let verse = currentTrack?.verse {
+            info[MPMediaItemPropertyArtist] = verse
+        }
+        if let imageName = currentPlaylistImageName, let image = UIImage(named: imageName) {
+            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+        }
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 }
