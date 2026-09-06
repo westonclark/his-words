@@ -76,7 +76,6 @@ struct PaywallView: View {
         VStack(spacing: 12) {
             PerkRow(icon: "infinity",        text: "Unlimited listening time")
             PerkRow(icon: "lock.open.fill",  text: "All premium playlists")
-            PerkRow(icon: "arrow.down.circle.fill", text: "Download tracks for offline use")
             PerkRow(icon: "icloud.fill",     text: "Syncs across all your devices")
         }
         .padding(.vertical, 16)
