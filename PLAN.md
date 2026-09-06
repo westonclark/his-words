@@ -265,9 +265,9 @@ Phase 5 — Upload & Verify (NEXT)
 Phase 6 — App Store Submission
 
 - [x] Add background audio in Xcode: Signing & Capabilities → Background Modes → Audio
-- [ ] Create app in App Store Connect
-- [ ] Set Bundle ID in Xcode (must match App Store Connect)
-- [ ] Create subscription products in App Store Connect (com.hiswords.monthly + com.hiswords.annual)
+- [x] Create app in App Store Connect
+- [x] Set Bundle ID in Xcode (must match App Store Connect)
+- [x] Create subscription products in App Store Connect (com.hiswords.monthly + com.hiswords.annual)
 - [ ] Configure In-App Purchase entitlements in Xcode
 - [ ] Add app icon (1024x1024 required for App Store)
 - [ ] Add launch screen or splash image

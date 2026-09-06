@@ -89,7 +89,7 @@ struct PaywallView: View {
         HStack(spacing: 12) {
             PlanCard(
                 title: "Monthly",
-                price: "$17.99",
+                price: monthlyProduct?.displayPrice ?? "$17.99",
                 period: "per month",
                 badge: nil,
                 isSelected: selectedPlan == .monthly
@@ -97,11 +97,48 @@ struct PaywallView: View {
 
             PlanCard(
                 title: "Annual",
-                price: "$9.99",
+                price: annualMonthlyEquivalentPrice,
                 period: "per month",
-                badge: "SAVE 44%",
+                badge: annualSavingsBadge,
                 isSelected: selectedPlan == .annual
             ) { selectedPlan = .annual }
+        }
+    }
+
+    private var monthlyProduct: Product? {
+        storeKit.products.first(where: { $0.id == "com.hiswords.monthly" })
+    }
+
+    private var annualProduct: Product? {
+        storeKit.products.first(where: { $0.id == "com.hiswords.annual" })
+    }
+
+    /// Effective per-month cost of the annual plan, in the customer's real storefront currency.
+    /// Truncated (not rounded) to the cent so the displayed "as low as" figure never overstates the discount.
+    private var annualMonthlyEquivalentPrice: String {
+        guard let annual = annualProduct else { return "$9.99" }
+        var monthly = annual.price / 12
+        var truncated = Decimal()
+        NSDecimalRound(&truncated, &monthly, 2, .down)
+        return annual.priceFormatStyle.format(truncated)
+    }
+
+    private var annualSavingsBadge: String? {
+        guard let monthly = monthlyProduct, let annual = annualProduct else { return "SAVE 44%" }
+        let yearlyAtMonthlyRate = monthly.price * 12
+        guard yearlyAtMonthlyRate > 0 else { return nil }
+        let savings = NSDecimalNumber(decimal: (yearlyAtMonthlyRate - annual.price) / yearlyAtMonthlyRate).doubleValue
+        let percent = Int((savings * 100).rounded())
+        return percent > 0 ? "SAVE \(percent)%" : nil
+    }
+
+    private var subscribeCaption: String {
+        if selectedPlan == .annual {
+            let price = annualProduct?.displayPrice ?? "$119.99"
+            return "\(price)/year, billed annually"
+        } else {
+            let price = monthlyProduct?.displayPrice ?? "$17.99"
+            return "\(price)/month, cancel anytime"
         }
     }
 
@@ -125,7 +162,7 @@ struct PaywallView: View {
                 Text(selectedPlan == .annual ? "Subscribe Annually" : "Subscribe Monthly")
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .foregroundColor(.warmBlack)
-                Text(selectedPlan == .annual ? "$119.99/year, billed annually" : "$17.99/month, cancel anytime")
+                Text(subscribeCaption)
                     .font(.system(size: 12, design: .rounded))
                     .foregroundColor(.warmBlack.opacity(0.65))
             }
