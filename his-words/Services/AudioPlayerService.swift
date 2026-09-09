@@ -363,8 +363,34 @@ final class AudioPlayerService: ObservableObject {
             info[MPMediaItemPropertyArtist] = verse
         }
         if let imageName = currentPlaylistImageName, let image = UIImage(named: imageName) {
-            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+            let squareImage = image.croppedToSquare()
+            info[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: squareImage.size) { _ in squareImage }
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+}
+
+private extension UIImage {
+    /// Lock screen and Control Center render `MPMediaItemArtwork` in a square
+    /// frame, so a non-square source (e.g. a 4:3 ambience photo) gets
+    /// letterboxed there even though it looks fine as a full-bleed player
+    /// background. Center-crop to a square before handing it to the artwork API.
+    func croppedToSquare() -> UIImage {
+        let side = min(size.width, size.height)
+        guard side != max(size.width, size.height) else { return self }
+
+        // Some source photos carry an EXIF orientation tag, so the raw
+        // `cgImage` pixel buffer doesn't match `size`/`imageOrientation`
+        // (e.g. a landscape buffer that's meant to display as portrait).
+        // Drawing through `draw(at:)` applies that orientation for us,
+        // instead of cropping the unrotated buffer directly.
+        let origin = CGPoint(x: (size.width - side) / 2, y: (size.height - side) / 2)
+        let format = UIGraphicsImageRendererFormat.preferred()
+        format.scale = scale
+        format.opaque = true
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format)
+        return renderer.image { _ in
+            draw(at: CGPoint(x: -origin.x, y: -origin.y))
+        }
     }
 }
