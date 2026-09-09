@@ -96,8 +96,8 @@ struct PaywallView: View {
 
             PlanCard(
                 title: "Annual",
-                price: annualMonthlyEquivalentPrice,
-                period: "per month",
+                price: annualProduct?.displayPrice ?? "$119.99",
+                period: "per year",
                 badge: annualSavingsBadge,
                 isSelected: selectedPlan == .annual
             ) { selectedPlan = .annual }
@@ -110,16 +110,6 @@ struct PaywallView: View {
 
     private var annualProduct: Product? {
         storeKit.products.first(where: { $0.id == "com.hiswords.annual" })
-    }
-
-    /// Effective per-month cost of the annual plan, in the customer's real storefront currency.
-    /// Truncated (not rounded) to the cent so the displayed "as low as" figure never overstates the discount.
-    private var annualMonthlyEquivalentPrice: String {
-        guard let annual = annualProduct else { return "$9.99" }
-        var monthly = annual.price / 12
-        var truncated = Decimal()
-        NSDecimalRound(&truncated, &monthly, 2, .down)
-        return annual.priceFormatStyle.format(truncated)
     }
 
     private var annualSavingsBadge: String? {
@@ -191,10 +181,20 @@ struct PaywallView: View {
     }
 
     private var legalText: some View {
-        Text("Subscription auto-renews unless cancelled at least 24 hours before the end of the period. Manage in App Store settings.")
-            .font(.system(size: 11, design: .rounded))
-            .foregroundColor(.mutedCream.opacity(0.6))
-            .multilineTextAlignment(.center)
+        VStack(spacing: 8) {
+            Text("Subscription auto-renews unless cancelled at least 24 hours before the end of the period. Manage in App Store settings.")
+                .font(.system(size: 11, design: .rounded))
+                .foregroundColor(.mutedCream.opacity(0.6))
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 6) {
+                Link("Terms of Use", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                Text("·")
+                Link("Privacy Policy", destination: URL(string: "https://westonclark.github.io/his-words/privacy.html")!)
+            }
+            .font(.system(size: 11, weight: .medium, design: .rounded))
+            .foregroundColor(.mutedCream.opacity(0.75))
+        }
     }
 }
 
