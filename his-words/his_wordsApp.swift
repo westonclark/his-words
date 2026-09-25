@@ -20,6 +20,12 @@ struct his_wordsApp: App {
                     audio.localURLProvider = { [weak downloads] track in
                         downloads?.localURL(for: track)
                     }
+                    audio.isPlaybackAllowed = { [weak trial] in
+                        !(trial?.hasExhaustedTrial ?? false)
+                    }
+                    audio.onPlaybackBlocked = { [weak appState] in
+                        appState?.showPaywall = true
+                    }
                     trial.observe(audio)
                     trial.observeSubscriptionStatus(from: storeKit)
                 }

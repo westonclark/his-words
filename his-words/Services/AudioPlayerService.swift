@@ -29,6 +29,19 @@ final class AudioPlayerService: ObservableObject {
     /// Injected at launch so the service can rebuild playlists on its own.
     var localURLProvider: ((Track) -> URL?)?
 
+    /// Consulted before resuming or advancing playback. Track *selection* is
+    /// already gated where it happens (e.g. `AmbienceSelectionView` checks the
+    /// trial before calling `start`/`play`), but once a track is loaded, the
+    /// mini player, the player's own transport controls, and lock-screen
+    /// commands can all resume or skip it without going through that gate —
+    /// so this is checked again here, at the one place all of them funnel
+    /// through, instead of relying on each call site to remember.
+    var isPlaybackAllowed: (() -> Bool)?
+
+    /// Called when a play/resume/skip attempt above is blocked, so the app can
+    /// surface the paywall the same way a blocked track selection does.
+    var onPlaybackBlocked: (() -> Void)?
+
     private let player = AVQueuePlayer()
     private var timeObserver: Any?
     private var currentItemObservation: NSKeyValueObservation?
@@ -110,11 +123,17 @@ final class AudioPlayerService: ObservableObject {
         guard player.currentItem != nil else {
             // Playback ran off the end of a non-looping playlist: the queue is
             // empty, so pressing play again starts over from the top.
-            if !currentPlaylist.isEmpty { rebuildQueue(startingAt: 0) }
+            if !currentPlaylist.isEmpty, canResumePlayback() { rebuildQueue(startingAt: 0) }
             return
         }
-        if isPlaying { player.pause() } else { player.play() }
-        isPlaying.toggle()
+        if isPlaying {
+            player.pause()
+            isPlaying = false
+        } else {
+            guard canResumePlayback() else { return }
+            player.play()
+            isPlaying = true
+        }
         updateNowPlayingInfo()
     }
 
@@ -131,7 +150,7 @@ final class AudioPlayerService: ObservableObject {
     /// Skipping forward is the one jump the queue already holds buffered, so it
     /// advances rather than rebuilding.
     func next() {
-        guard !currentPlaylist.isEmpty else { return }
+        guard !currentPlaylist.isEmpty, canResumePlayback() else { return }
         if currentIndex + 1 < currentPlaylist.count {
             player.advanceToNextItem()
         } else if isLooping {
@@ -142,7 +161,7 @@ final class AudioPlayerService: ObservableObject {
     }
 
     func previous() {
-        guard !currentPlaylist.isEmpty else { return }
+        guard !currentPlaylist.isEmpty, canResumePlayback() else { return }
         if currentIndex - 1 >= 0 {
             rebuildQueue(startingAt: currentIndex - 1)
         } else if isLooping {
@@ -182,6 +201,14 @@ final class AudioPlayerService: ObservableObject {
 
     func resetSessionTime() {
         sessionSeconds = 0
+    }
+
+    private func canResumePlayback() -> Bool {
+        guard isPlaybackAllowed?() ?? true else {
+            onPlaybackBlocked?()
+            return false
+        }
+        return true
     }
 
     // MARK: – Queue
