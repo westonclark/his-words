@@ -7,7 +7,7 @@ struct PaywallView: View {
     @EnvironmentObject var storeKit: StoreKitManager
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedPlan: Plan = .annual
+    @State private var selectedPlan: Plan = .monthly
     @State private var isPurchasing = false
 
     enum Plan { case monthly, annual }
@@ -252,11 +252,16 @@ private struct PlanCard: View {
                 if let badge {
                     Text(badge)
                         .font(.system(size: 9, weight: .bold, design: .rounded))
-                        .foregroundColor(.warmBlack)
+                        .foregroundColor(.mutedGold)
                         .tracking(0.8)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 4)
-                        .background(Color.mutedGold)
+                        .background(
+                            ZStack {
+                                Color.warmBlack
+                                Color.mutedGold.opacity(0.15)
+                            }
+                        )
                         .clipShape(Capsule())
                         .offset(x: -8, y: -8)
                 }
