@@ -8,7 +8,7 @@ struct OnboardingView: View {
         (
             "text.bubble.fill",
             "Rewrite the Script",
-            "Your body is reading a script God didn't write. \nHis Words replaces it with truth."
+            "Your mind is reading a script God didn't write. \nHis Words replaces it with truth."
         ),
         (
             "brain.head.profile",

@@ -65,7 +65,7 @@ struct PaywallView: View {
                 .font(.system(size: 28, weight: .semibold, design: .serif))
                 .foregroundColor(.creamWhite)
 
-            Text("Unlimited nature sounds, every day.")
+            Text("Unlimited access to the full catalog.")
                 .font(.system(size: 15, design: .rounded))
                 .foregroundColor(.mutedCream)
                 .multilineTextAlignment(.center)
