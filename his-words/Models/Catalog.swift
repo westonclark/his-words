@@ -12,10 +12,7 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
     case biblicalAffirmations = "biblical-affirmations"
     case healingFrequencies   = "healing-frequencies"
     case childOfAKing = "child-of-a-king"
-    case confidence
-    case health
     case paulsPrayers = "pauls-prayers"
-    case loved
 
     var id: String { rawValue }
 
@@ -24,10 +21,7 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
         case .biblicalAffirmations: return "Biblical Affirmations"
         case .healingFrequencies:   return "Healing Frequencies"
         case .childOfAKing:         return "As a Child of a King"
-        case .confidence:           return "Confidence"
-        case .health:               return "Health"
         case .paulsPrayers:         return "Paul's Prayers"
-        case .loved:                return "Loved"
         }
     }
 
@@ -36,17 +30,14 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
         case .biblicalAffirmations: return "Scripture-rooted identity, spoken over you"
         case .healingFrequencies:   return "Solfeggio tones for rest and restoration"
         case .childOfAKing:         return "Coming soon"
-        case .confidence:           return "Coming soon"
-        case .health:               return "Coming soon"
         case .paulsPrayers:         return "Coming soon"
-        case .loved:                return "Coming soon"
         }
     }
 
     var isAvailable: Bool {
         switch self {
         case .biblicalAffirmations, .healingFrequencies: return true
-        case .childOfAKing, .confidence, .health, .paulsPrayers, .loved: return false
+        case .childOfAKing, .paulsPrayers: return false
         }
     }
 
@@ -54,7 +45,7 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .biblicalAffirmations: return "topic-biblical-affirmations"
         case .healingFrequencies:   return Ambience.oceanWaves.imageName
-        case .childOfAKing, .confidence, .health, .paulsPrayers, .loved: return nil
+        case .childOfAKing, .paulsPrayers: return nil
         }
     }
 
@@ -63,10 +54,7 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
         case .biblicalAffirmations: return "text.bubble.fill"
         case .healingFrequencies:   return "waveform"
         case .childOfAKing:         return "crown.fill"
-        case .confidence:           return "shield.fill"
-        case .health:               return "heart.fill"
         case .paulsPrayers:         return "hands.sparkles.fill"
-        case .loved:                return "heart.text.square.fill"
         }
     }
 
@@ -191,7 +179,7 @@ enum Catalog {
             return affirmationTracks(context)
         case .healingFrequencies:
             return [healingFrequencyTrack(context.ambience)]
-        case .childOfAKing, .confidence, .health, .paulsPrayers, .loved:
+        case .childOfAKing, .paulsPrayers:
             return []
         }
     }
