@@ -29,15 +29,15 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .biblicalAffirmations: return "Scripture-rooted identity, spoken over you"
         case .healingFrequencies:   return "Solfeggio tones for rest and restoration"
-        case .childOfAKing:         return "Coming soon"
+        case .childOfAKing:         return "Fifty declarations of who you are in Him"
         case .paulsPrayers:         return "Coming soon"
         }
     }
 
     var isAvailable: Bool {
         switch self {
-        case .biblicalAffirmations, .healingFrequencies: return true
-        case .childOfAKing, .paulsPrayers: return false
+        case .biblicalAffirmations, .healingFrequencies, .childOfAKing: return true
+        case .paulsPrayers: return false
         }
     }
 
@@ -45,7 +45,8 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .biblicalAffirmations: return "topic-biblical-affirmations"
         case .healingFrequencies:   return Ambience.oceanWaves.imageName
-        case .childOfAKing, .paulsPrayers: return nil
+        case .childOfAKing:         return "topic-child-of-a-king"
+        case .paulsPrayers:         return nil
         }
     }
 
@@ -59,7 +60,7 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
     }
 
     /// Whether the voice / person toggles apply to this topic's audio.
-    var hasVoiceOptions: Bool { self == .biblicalAffirmations }
+    var hasVoiceOptions: Bool { self == .biblicalAffirmations || self == .childOfAKing }
 
     static let featured: Topic = .biblicalAffirmations
 }
@@ -179,14 +180,32 @@ enum Catalog {
             return affirmationTracks(context)
         case .healingFrequencies:
             return [healingFrequencyTrack(context.ambience)]
-        case .childOfAKing, .paulsPrayers:
+        case .childOfAKing:
+            return childOfAKingTracks(context)
+        case .paulsPrayers:
             return []
         }
     }
 
     private static func affirmationTracks(_ context: PlaybackContext) -> [Track] {
-        entries(voice: context.voice, person: context.person).map { recording in
-            let path = "\(audioBase)/biblical-affirmations/\(context.ambience.rawValue)/\(context.voice.rawValue)/\(context.person.rawValue)/\(recording.file).m4a"
+        tracks(
+            for: context,
+            topicFolder: "biblical-affirmations",
+            recordings: entries(voice: context.voice, person: context.person)
+        )
+    }
+
+    private static func childOfAKingTracks(_ context: PlaybackContext) -> [Track] {
+        tracks(for: context, topicFolder: "child-of-a-king", recordings: childOfAKingRecordings)
+    }
+
+    private static func tracks(
+        for context: PlaybackContext,
+        topicFolder: String,
+        recordings: [VoiceRecording]
+    ) -> [Track] {
+        recordings.map { recording in
+            let path = "\(audioBase)/\(topicFolder)/\(context.ambience.rawValue)/\(context.voice.rawValue)/\(context.person.rawValue)/\(recording.file).m4a"
             return Track(
                 id: stableID(path),
                 title: recording.title,
@@ -966,4 +985,61 @@ private let secondPersonTracks: [AffirmationTrack] = [
             verse: "Psalm 51:15"
         )
     ),
+]
+
+
+// MARK: – As a Child of a King
+
+/// Both voices and both person-forms share one sequence; only the folder differs.
+private let childOfAKingRecordings: [VoiceRecording] = [
+    .init(file: "01-fully-known-1-corinthians-13-12-psalm-139-zephaniah-3-17", title: "Fully Known", verse: "1 Corinthians 13:12, Psalm 139, Zephaniah 3:17"),
+    .init(file: "02-highly-favored-psalm-5-12-psalm-84-11-john-1-12-luke-12-32", title: "Highly Favored", verse: "Psalm 5:12, Psalm 84:11, John 1:12, Luke 12:32"),
+    .init(file: "03-royal-heir-of-yahweh-galatians-4-6-7-1-peter-2-9-romans-8-16-17", title: "Royal Heir of Yahweh", verse: "Galatians 4:6-7, 1 Peter 2:9, Romans 8:16-17"),
+    .init(file: "04-the-head-not-the-tail-deuteronomy-28-9-14", title: "The Head, not the Tail", verse: "Deuteronomy 28:9-14"),
+    .init(file: "05-filled-with-wisdom-colossians-1-9", title: "Filled with Wisdom", verse: "Colossians 1:9"),
+    .init(file: "06-knowledge-of-gods-will-colossians-1-9", title: "Knowledge of God’s Will", verse: "Colossians 1:9"),
+    .init(file: "07-yahweh-wants-to-prosper-you-psalm-35-27-romans-8-32", title: "Yahweh Wants to Prosper You", verse: "Psalm 35:27, Romans 8:32"),
+    .init(file: "08-its-yahwehs-delight-to-prosper-you-deuteronomy-28-18-psalm-35-27-proverbs-8-12-21", title: "It’s Yahweh’s Delight to Prosper You", verse: "Deuteronomy 28:18, Psalm 35:27, Proverbs 8:12-21"),
+    .init(file: "09-guided-by-the-spirit-of-god-psalm-37-23-proverbs-3-5", title: "Guided by the Spirit of God", verse: "Psalm 37:23, Proverbs 3:5"),
+    .init(file: "10-given-everything-you-need-2-peter-1-3-4-numbers-13-30", title: "Given Everything You Need", verse: "2 Peter 1:3-4, Numbers 13:30"),
+    .init(file: "11-blessings-of-yahweh-chase-you-down-deuteronomy-28-2", title: "Blessings of Yahweh Chase You Down", verse: "Deuteronomy 28:2"),
+    .init(file: "12-given-unto-you-liberally-luke-6-38", title: "Given Unto You Liberally", verse: "Luke 6:38"),
+    .init(file: "13-blessed-with-overflow-malachi-3-10", title: "Blessed with Overflow", verse: "Malachi 3:10"),
+    .init(file: "14-unstoppable-success-malachi-3-11", title: "Unstoppable Success", verse: "Malachi 3:11"),
+    .init(file: "15-abundance-and-prosperity-proverbs-3-9-10", title: "Abundance & Prosperity", verse: "Proverbs 3:9-10"),
+    .init(file: "16-flourishing-and-prosperous-psalm-1-1-3", title: "Flourishing & Prosperous", verse: "Psalm 1:1-3"),
+    .init(file: "17-the-blessing-of-yahweh-makes-you-rich-proverbs-10-22", title: "The Blessing of Yahweh Makes You Rich", verse: "Proverbs 10:22"),
+    .init(file: "18-everything-turned-for-good-romans-8-28-genesis-50-20", title: "Everything Turned for Good", verse: "Romans 8:28, Genesis 50:20"),
+    .init(file: "19-favor-comes-to-you-2-corinthians-9-8", title: "Favor Comes to You", verse: "2 Corinthians 9:8"),
+    .init(file: "20-god-blesses-the-work-of-your-hands-deuteronomy-28-12", title: "God Blesses the Work of Your Hands", verse: "Deuteronomy 28:12"),
+    .init(file: "21-your-mind-is-renewed-ephesians-4-23-romans-12-2", title: "Your Mind is Renewed", verse: "Ephesians 4:23, Romans 12:2"),
+    .init(file: "22-delivered-colossians-1-13-14", title: "Delivered", verse: "Colossians 1:13-14"),
+    .init(file: "23-supernatural-creativity-to-prosper-genesis-41-37-49-exodus-31-1-3", title: "Supernatural Creativity to Prosper", verse: "Genesis 41:37-49, Exodus 31:1-3"),
+    .init(file: "24-success-proverbs-16-3", title: "Success", verse: "Proverbs 16:3"),
+    .init(file: "25-all-your-needs-are-met-philippians-4-19", title: "All Your Needs are Met", verse: "Philippians 4:19"),
+    .init(file: "26-no-good-thing-is-withheld-psalm-84-11-12", title: "No Good Thing is Withheld", verse: "Psalm 84:11-12"),
+    .init(file: "27-reigning-in-life-romans-5-17-romans-8-17", title: "Reigning in Life", verse: "Romans 5:17, Romans 8:17"),
+    .init(file: "28-god-delights-in-your-prosperity-psalm-35-7-galatians-3-14", title: "God Delights in Your Prosperity", verse: "Psalm 35:7, Galatians 3:14"),
+    .init(file: "29-chosen-by-yahweh-deuteronomy-26-18-19-1-peter-2-9", title: "Chosen by Yahweh", verse: "Deuteronomy 26:18-19, 1 Peter 2:9"),
+    .init(file: "30-nothing-is-too-hard-for-you-isaiah-41-10-philippians-4-13", title: "Nothing is too Hard for You", verse: "Isaiah 41:10, Philippians 4:13"),
+    .init(file: "31-influence-peace-luke-10-5-6-romans-12-21-romans-15-13-ephesians-4-2-3", title: "Influence Peace", verse: "Luke 10:5-6, Romans 12:21, Romans 15:13, Ephesians 4:2-3"),
+    .init(file: "32-humble-1-peter-5-5-ephesians-2-8-9-philippians-2-3-8", title: "Humble", verse: "1 Peter 5:5, Ephesians 2:8-9, Philippians 2:3-8"),
+    .init(file: "33-born-to-win-matthew-5-39-47-1-john-5-4-1-corinthians-15-57-romans-8-37-luke-10-19", title: "Born to Win", verse: "Matthew 5:39-47, 1 John 5:4, 1 Corinthians 15:57, Romans 8:37, Luke 10:19"),
+    .init(file: "34-fully-grateful-1-thessalonians-5-18-philippians-4-6", title: "Fully Grateful", verse: "1 Thessalonians 5:18, Philippians 4:6"),
+    .init(file: "35-defend-the-defenseless-proverbs-31-8-9-isaiah-1-17-psalm-82-3", title: "Defend the Defenseless", verse: "Proverbs 31:8-9, Isaiah 1:17, Psalm 82:3"),
+    .init(file: "36-rise-to-the-occasion-joshua-1-9-galatians-6-9", title: "Rise to the Occasion", verse: "Joshua 1:9, Galatians 6:9"),
+    .init(file: "37-god-provides-the-power-proverbs-16-9-proverbs-21-31-zechariah-4-6-isaiah-40-29", title: "God Provides the Power", verse: "Proverbs 16:9, Proverbs 21:31, Zechariah 4:6, Isaiah 40:29"),
+    .init(file: "38-flow-in-submission-the-spirit-proverbs-3-5-6-galatians-5-25-proverbs-4-11-12-proverbs-16-3-1-samuel-18-14", title: "Flow: in Submission the Spirit", verse: "Proverbs 3:5-6, Galatians 5:25, Proverbs 4:11-12, Proverbs 16:3, 1 Samuel 18:14"),
+    .init(file: "39-power-in-vulnerability-2-corinthians-13-4-james-5-16-philippians-2-5-9", title: "Power in Vulnerability", verse: "2 Corinthians 13:4, James 5:16, Philippians 2:5-9"),
+    .init(file: "40-finish-strong-hebrews-12-1", title: "Finish Strong", verse: "Hebrews 12:1"),
+    .init(file: "41-confident-jeremiah-17-7-8-jeremiah-9-23-24-1-corinthians-1-30-31-philippians-3-3", title: "Confident", verse: "Jeremiah 17:7-8, Jeremiah 9:23-24, 1 Corinthians 1:30-31, Philippians 3:3"),
+    .init(file: "42-resting-in-peace-joy-and-confidence-isaiah-55-12-psalm-4-8-psalm-29-11-psalm-119-165", title: "Resting in Peace, Joy, & Confidence", verse: "Isaiah 55:12, Psalm 4:8, Psalm 29:11, Psalm 119:165"),
+    .init(file: "43-radiant-psalm-34-4-5", title: "Radiant", verse: "Psalm 34:4-5"),
+    .init(file: "44-thankful-in-advance-mark-11-24-philippians-4-6-7-john-11-41", title: "Thankful in Advance", verse: "Mark 11:24, Philippians 4:6-7, John 11:41"),
+    .init(file: "45-claimed-by-yahweh-deuteronomy-28-1-13", title: "Claimed by Yahweh", verse: "Deuteronomy 28:1-13"),
+    .init(file: "46-abundance-from-yahweh-proverbs-3-9-10", title: "Abundance from Yahweh", verse: "Proverbs 3:9-10"),
+    .init(file: "47-flourishing-and-prosperous-psalm-1-1-3", title: "Flourishing & Prosperous", verse: "Psalm 1:1-3"),
+    .init(file: "48-blessing-follows-you-deuteronomy-28-1-13", title: "Blessing Follows You", verse: "Deuteronomy 28:1-13"),
+    .init(file: "49-above-not-beneath-deuteronomy-28-13", title: "Above, Not Beneath", verse: "Deuteronomy 28:13"),
+    .init(file: "50-child-of-god-deuteronomy-28-13", title: "Child of God", verse: "Deuteronomy 28:13"),
 ]
