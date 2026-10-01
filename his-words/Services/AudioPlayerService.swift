@@ -102,13 +102,15 @@ final class AudioPlayerService: ObservableObject {
         loadContextPlaylist(startingAt: currentIndex)
     }
 
-    /// Swaps 1st / 2nd person. The recordings don't line up, so playback restarts.
+    /// Swaps 1st / 2nd person, restarting the current track in the new person.
+    /// If the new playlist is shorter (e.g. female "you are" has 26 tracks),
+    /// `loadContextPlaylist` clamps to its last track.
     func setPerson(_ person: PersonOption) {
         guard var context, context.person != person else { return }
         context.person = person
         self.context = context
         PlaybackPreferences.person = person
-        loadContextPlaylist(startingAt: 0)
+        loadContextPlaylist(startingAt: currentIndex)
     }
 
     func play(playlist: [Track], startingAt index: Int = 0, localURLs: [UUID: URL] = [:], imageName: String? = nil, totalCount: Int = 0) {
