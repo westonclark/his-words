@@ -92,11 +92,24 @@ struct PlayerView: View {
     }
 
     private var dragHandle: some View {
-        RoundedRectangle(cornerRadius: 3)
-            .fill(Color.creamWhite.opacity(0.25))
-            .frame(width: 36, height: 5)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity)
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.creamWhite.opacity(0.25))
+                .frame(width: 36, height: 5)
+                .frame(maxWidth: .infinity)
+
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.creamWhite.opacity(0.8))
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .accessibilityLabel("Close player")
+        }
+        .padding(.vertical, 4)
     }
 
     private var dismissDrag: some Gesture {
