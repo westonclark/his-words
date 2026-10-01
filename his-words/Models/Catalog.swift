@@ -10,8 +10,8 @@ private let audioBase = "audio"
 
 enum Topic: String, CaseIterable, Identifiable, Hashable {
     case biblicalAffirmations = "biblical-affirmations"
+    case childOfAKing         = "child-of-a-king"
     case healingFrequencies   = "healing-frequencies"
-    case childOfAKing = "child-of-a-king"
     case paulsPrayers = "pauls-prayers"
 
     var id: String { rawValue }
