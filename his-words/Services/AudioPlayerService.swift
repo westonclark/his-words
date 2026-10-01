@@ -86,6 +86,13 @@ final class AudioPlayerService: ObservableObject {
         loadContextPlaylist(startingAt: 0)
     }
 
+    /// Plays a standalone album. Clears the topic context so the voice and
+    /// person toggles don't apply to it.
+    func start(album: HealingAlbum) {
+        context = nil
+        play(playlist: Catalog.tracks(for: album), imageName: album.imageName)
+    }
+
     /// Swaps the narrator, restarting the current track in the new voice.
     func setVoice(_ voice: VoiceOption) {
         guard var context, context.voice != voice else { return }

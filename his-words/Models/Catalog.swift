@@ -19,7 +19,7 @@ enum Topic: String, CaseIterable, Identifiable, Hashable {
     var title: String {
         switch self {
         case .biblicalAffirmations: return "Biblical Affirmations"
-        case .healingFrequencies:   return "Healing Frequencies"
+        case .healingFrequencies:   return "Nature Sounds & Healing Frequencies"
         case .childOfAKing:         return "As a Child of a King"
         case .paulsPrayers:         return "Paul's Prayers"
         }
@@ -211,6 +211,22 @@ enum Catalog {
                 title: recording.title,
                 verse: recording.verse,
                 category: context.ambience.category,
+                duration: 0,
+                streamURL: "\(cdnBase)/\(path)",
+                isPremium: false
+            )
+        }
+    }
+
+    /// Piano albums under healing-frequencies/<album folder>/<file>.m4a.
+    static func tracks(for album: HealingAlbum) -> [Track] {
+        album.recordings.map { recording in
+            let path = "\(audioBase)/healing-frequencies/\(album.folder)/\(recording.file).m4a"
+            return Track(
+                id: stableID(path),
+                title: recording.title,
+                verse: album.title,
+                category: album.category,
                 duration: 0,
                 streamURL: "\(cdnBase)/\(path)",
                 isPremium: false
@@ -1043,3 +1059,58 @@ private let childOfAKingRecordings: [VoiceRecording] = [
     .init(file: "49-above-not-beneath-deuteronomy-28-13", title: "Above, Not Beneath", verse: "Deuteronomy 28:13"),
     .init(file: "50-child-of-god-deuteronomy-28-13", title: "Child of God", verse: "Deuteronomy 28:13"),
 ]
+
+
+// MARK: – Healing frequency albums
+
+struct HealingAlbum: Identifiable, Hashable {
+    let folder: String
+    let title: String
+    let subtitle: String
+    let imageName: String
+    let category: Track.Category
+    let recordings: [VoiceRecording]
+
+    var id: String { folder }
+
+    static func == (lhs: HealingAlbum, rhs: HealingAlbum) -> Bool { lhs.folder == rhs.folder }
+    func hash(into hasher: inout Hasher) { hasher.combine(folder) }
+
+    static let all: [HealingAlbum] = [
+        .init(
+            folder: "ocean-and-444hz-piano",
+            title: "Ocean & 444Hz Piano",
+            subtitle: "Ocean waves with 444Hz piano",
+            imageName: "healing-album-ocean-444hz",
+            category: .ocean,
+            recordings: [
+                .init(file: "peace-be-still", title: "Peace, Be Still", verse: ""),
+            ]
+        ),
+        .init(
+            folder: "nature-and-432hz-piano-vol-1",
+            title: "Nature & 432Hz Piano, Vol. 1",
+            subtitle: "Nature sounds with 432Hz piano",
+            imageName: "healing-album-nature-432hz-vol-1",
+            category: .forest,
+            recordings: [
+                .init(file: "01-heart-and-hands", title: "Heart & Hands", verse: ""),
+                .init(file: "02-life-gate", title: "Life Gate", verse: ""),
+                .init(file: "03-awakening", title: "Awakening", verse: ""),
+                .init(file: "04-aura-cleansing", title: "Aura Cleansing", verse: ""),
+            ]
+        ),
+        .init(
+            folder: "nature-and-432hz-piano-vol-2",
+            title: "Nature & 432Hz Piano, Vol. 2",
+            subtitle: "Nature sounds with 432Hz piano",
+            imageName: "healing-album-nature-432hz-vol-2",
+            category: .forest,
+            recordings: [
+                .init(file: "01-refuge", title: "Refuge", verse: ""),
+                .init(file: "02-strength", title: "Strength", verse: ""),
+                .init(file: "03-rest-and-release", title: "Rest & Release", verse: ""),
+            ]
+        ),
+    ]
+}

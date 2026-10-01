@@ -18,6 +18,7 @@ struct PlayerView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(minWidth: 0, maxWidth: .infinity)
+                    .scaleEffect(imageZoom(for: imageName), anchor: .top)
                     .clipped() // Cuts off the horizontal overflow
                     .ignoresSafeArea()
                     .overlay {
@@ -72,6 +73,12 @@ struct PlayerView: View {
                 appState.showPaywall = true
             }
         }
+    }
+
+    /// The nature album covers have title text baked into the bottom quarter.
+    /// Zooming from the top edge pushes that part off screen.
+    private func imageZoom(for imageName: String) -> CGFloat {
+        imageName.hasPrefix("healing-album-nature") ? 1.4 : 1
     }
 
     // MARK: – Subviews

@@ -23,6 +23,9 @@ struct AmbienceSelectionView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     heading
                     ambienceList
+                    if topic == .healingFrequencies {
+                        albumList
+                    }
                 }
                 .padding(.bottom, audio.currentTrack != nil ? 110 : 40)
             }
@@ -92,13 +95,15 @@ struct AmbienceSelectionView: View {
     private var ambienceList: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("CHOOSE YOUR AMBIENCE")
+                Text(topic == .healingFrequencies ? "NATURE SOUNDS" : "CHOOSE YOUR AMBIENCE")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .tracking(1.2)
                     .foregroundColor(.mutedCream)
-                Text("Pick the sound you'd like to rest in.")
-                    .font(.system(size: 14, design: .rounded))
-                    .foregroundColor(.mutedCream.opacity(0.75))
+                if topic != .healingFrequencies {
+                    Text("Pick the sound you'd like to rest in.")
+                        .font(.system(size: 14, design: .rounded))
+                        .foregroundColor(.mutedCream.opacity(0.75))
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 12)
@@ -112,6 +117,35 @@ struct AmbienceSelectionView: View {
                 .buttonStyle(.plain)
             }
         }
+    }
+
+    private var albumList: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("PIANO ALBUMS")
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .tracking(1.2)
+                .foregroundColor(.mutedCream)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 12)
+
+            ForEach(HealingAlbum.all) { album in
+                Button {
+                    startPlayback(album)
+                } label: {
+                    AlbumRow(album: album)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func startPlayback(_ album: HealingAlbum) {
+        guard !trial.hasExhaustedTrial else {
+            appState.showPaywall = true
+            return
+        }
+        audio.start(album: album)
+        showPlayer = true
     }
 
     private func startPlayback(_ ambience: Ambience) {
@@ -144,6 +178,39 @@ private struct AmbienceRow: View {
                 Text(ambience.soundDescription)
                     .font(.system(size: 13, design: .rounded))
                     .foregroundColor(.mutedCream)
+            }
+
+            Spacer(minLength: 8)
+
+            Image(systemName: "play.circle.fill")
+                .font(.system(size: 24))
+                .foregroundColor(.mutedGold.opacity(0.85))
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+    }
+}
+
+private struct AlbumRow: View {
+    let album: HealingAlbum
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(album.imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(album.title)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundColor(.creamWhite)
+                Text("\(album.recordings.count == 1 ? "1 track" : "\(album.recordings.count) tracks") · \(album.subtitle)")
+                    .font(.system(size: 13, design: .rounded))
+                    .foregroundColor(.mutedCream)
+                    .lineLimit(1)
             }
 
             Spacer(minLength: 8)
