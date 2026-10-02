@@ -157,7 +157,7 @@ enum PlaybackPreferences {
     static var voice: VoiceOption {
         get {
             UserDefaults.standard.string(forKey: voiceKey)
-                .flatMap(VoiceOption.init(rawValue:)) ?? .male
+                .flatMap(VoiceOption.init(rawValue:)) ?? .female
         }
         set { UserDefaults.standard.set(newValue.rawValue, forKey: voiceKey) }
     }
