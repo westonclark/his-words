@@ -411,22 +411,30 @@ private extension UIImage {
     /// frame, so a non-square source (e.g. a 4:3 ambience photo) gets
     /// letterboxed there even though it looks fine as a full-bleed player
     /// background. Center-crop to a square before handing it to the artwork API.
-    func croppedToSquare() -> UIImage {
-        let side = min(size.width, size.height)
-        guard side != max(size.width, size.height) else { return self }
+    ///
+    /// The result is also downscaled to `maxSide` pixels. The system artwork
+    /// consumer runs out of process with a tight memory budget, and older
+    /// devices/OS versions silently drop multi-thousand-pixel bitmaps.
+    func croppedToSquare(maxSide: CGFloat = 600) -> UIImage {
+        // Pixel dimensions, independent of the asset's `scale`.
+        let pixelSize = CGSize(width: size.width * scale, height: size.height * scale)
+        let sourceSide = min(pixelSize.width, pixelSize.height)
+        let outputSide = min(sourceSide, maxSide)
+        let ratio = outputSide / sourceSide
 
         // Some source photos carry an EXIF orientation tag, so the raw
         // `cgImage` pixel buffer doesn't match `size`/`imageOrientation`
         // (e.g. a landscape buffer that's meant to display as portrait).
-        // Drawing through `draw(at:)` applies that orientation for us,
+        // Drawing through `draw(in:)` applies that orientation for us,
         // instead of cropping the unrotated buffer directly.
-        let origin = CGPoint(x: (size.width - side) / 2, y: (size.height - side) / 2)
+        let drawSize = CGSize(width: pixelSize.width * ratio, height: pixelSize.height * ratio)
+        let origin = CGPoint(x: (outputSide - drawSize.width) / 2, y: (outputSide - drawSize.height) / 2)
         let format = UIGraphicsImageRendererFormat.preferred()
-        format.scale = scale
+        format.scale = 1
         format.opaque = true
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format)
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: outputSide, height: outputSide), format: format)
         return renderer.image { _ in
-            draw(at: CGPoint(x: -origin.x, y: -origin.y))
+            draw(in: CGRect(origin: origin, size: drawSize))
         }
     }
 }
