@@ -6,6 +6,9 @@ final class StoreKitManager: ObservableObject {
     @Published private(set) var products: [Product] = []
     @Published private(set) var purchasedProductIDs: Set<String> = []
     @Published var isLoading = false
+    /// False until the first `Transaction.currentEntitlements` pass finishes,
+    /// so an empty `purchasedProductIDs` isn't mistaken for "not subscribed".
+    @Published private(set) var hasResolvedEntitlements = false
 
     private var updateListenerTask: Task<Void, Never>? = nil
 
@@ -93,6 +96,7 @@ final class StoreKitManager: ObservableObject {
         }
 
         purchasedProductIDs = purchasedIDs
+        hasResolvedEntitlements = true
     }
 
     func isSubscribed() async -> Bool {

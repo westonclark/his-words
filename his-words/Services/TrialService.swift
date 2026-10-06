@@ -55,6 +55,8 @@ final class TrialService: ObservableObject {
     // Sync subscription status from StoreKit entitlements.
     @MainActor
     func syncSubscriptionStatus(from storeKit: StoreKitManager) {
+        // Keep the cached status until StoreKit has actually answered.
+        guard storeKit.hasResolvedEntitlements else { return }
         let hasEntitlement = !storeKit.purchasedProductIDs.isEmpty
         isSubscribed = hasEntitlement
         UserDefaults.standard.set(hasEntitlement, forKey: Self.subscriptionKey)
@@ -63,7 +65,7 @@ final class TrialService: ObservableObject {
     /// Keeps subscription status current as StoreKit's entitlement fetch
     /// resolves (it starts empty and updates asynchronously after launch).
     func observeSubscriptionStatus(from storeKit: StoreKitManager) {
-        storeKitCancellable = storeKit.$purchasedProductIDs
+        storeKitCancellable = Publishers.CombineLatest(storeKit.$purchasedProductIDs, storeKit.$hasResolvedEntitlements)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.syncSubscriptionStatus(from: storeKit)
