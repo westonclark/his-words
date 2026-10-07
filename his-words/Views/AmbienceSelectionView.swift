@@ -48,6 +48,9 @@ struct AmbienceSelectionView: View {
         }
         .fullScreenCover(isPresented: $showPlayer) {
             PlayerView()
+                .environmentObject(audio)
+                .environmentObject(trial)
+                .environmentObject(appState)
         }
     }
 
