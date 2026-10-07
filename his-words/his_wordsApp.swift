@@ -1,4 +1,5 @@
 import SwiftUI
+import FacebookCore
 
 @main
 struct his_wordsApp: App {
@@ -7,6 +8,11 @@ struct his_wordsApp: App {
     @StateObject private var trial     = TrialService()
     @StateObject private var downloads = DownloadService()
     @StateObject private var storeKit  = StoreKitManager()
+
+    init() {
+        Settings.shared.isAutoLogAppEventsEnabled = true
+        ApplicationDelegate.shared.initializeSDK()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -28,6 +34,11 @@ struct his_wordsApp: App {
                     }
                     trial.observe(audio)
                     trial.observeSubscriptionStatus(from: storeKit)
+                }
+                .onOpenURL { url in
+                    ApplicationDelegate.shared.application(
+                        UIApplication.shared, open: url,
+                        sourceApplication: nil, annotation: nil)
                 }
                 .preferredColorScheme(.dark)
         }

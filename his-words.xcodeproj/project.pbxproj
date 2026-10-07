@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7F0458BA2F9C89610049EE6C /* his-words.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 7F0458B92F9C89610049EE6C /* his-words.storekit */; };
+		7FB000012F92C76000AF3963 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7FB000032F92C76000AF3963 /* FacebookCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FB000012F92C76000AF3963 /* FacebookCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +89,7 @@
 			);
 			name = "his-words";
 			packageProductDependencies = (
+				7FB000032F92C76000AF3963 /* FacebookCore */,
 			);
 			productName = "his-words";
 			productReference = 7F5EA8C12F92C76000AF3963 /* his-words.app */;
@@ -116,6 +119,9 @@
 			);
 			mainGroup = 7F5EA8B82F92C76000AF3963;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7FB000022F92C76000AF3963 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7F5EA8C22F92C76000AF3963 /* Products */;
 			projectDirPath = "";
@@ -297,7 +303,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.colinclark.hiswords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -332,7 +338,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.colinclark.hiswords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -363,6 +369,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7FB000022F92C76000AF3963 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 18.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7FB000032F92C76000AF3963 /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7FB000022F92C76000AF3963 /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7F5EA8B92F92C76000AF3963 /* Project object */;
 }

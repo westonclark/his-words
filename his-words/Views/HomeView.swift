@@ -4,6 +4,7 @@ struct HomeView: View {
     @EnvironmentObject var audio: AudioPlayerService
     @EnvironmentObject var trial: TrialService
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var storeKit: StoreKitManager
     @Environment(\.openURL) private var openURL
 
     @State private var showPlayer = false
@@ -61,9 +62,15 @@ struct HomeView: View {
         .animation(.easeInOut(duration: 0.25), value: audio.currentTrack != nil)
         .fullScreenCover(isPresented: $showPlayer) {
             PlayerView()
+                .environmentObject(audio)
+                .environmentObject(trial)
+                .environmentObject(appState)
         }
         .sheet(isPresented: $appState.showPaywall) {
             PaywallView()
+                .environmentObject(trial)
+                .environmentObject(appState)
+                .environmentObject(storeKit)
         }
         .onChange(of: trial.hasExhaustedTrial) { _, exhausted in
             if exhausted { appState.showPaywall = true }
