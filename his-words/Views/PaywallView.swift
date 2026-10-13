@@ -88,7 +88,7 @@ struct PaywallView: View {
         HStack(spacing: 12) {
             PlanCard(
                 title: "Monthly",
-                price: monthlyProduct?.displayPrice ?? "$17.99",
+                price: monthlyProduct?.displayPrice ?? "$9.99",
                 period: "per month",
                 badge: nil,
                 isSelected: selectedPlan == .monthly
@@ -96,7 +96,7 @@ struct PaywallView: View {
 
             PlanCard(
                 title: "Annual",
-                price: annualProduct?.displayPrice ?? "$119.99",
+                price: annualProduct?.displayPrice ?? "$59.99",
                 period: "per year",
                 badge: annualSavingsBadge,
                 isSelected: selectedPlan == .annual
@@ -113,7 +113,7 @@ struct PaywallView: View {
     }
 
     private var annualSavingsBadge: String? {
-        guard let monthly = monthlyProduct, let annual = annualProduct else { return "SAVE 44%" }
+        guard let monthly = monthlyProduct, let annual = annualProduct else { return "SAVE 50%" }
         let yearlyAtMonthlyRate = monthly.price * 12
         guard yearlyAtMonthlyRate > 0 else { return nil }
         let savings = NSDecimalNumber(decimal: (yearlyAtMonthlyRate - annual.price) / yearlyAtMonthlyRate).doubleValue
@@ -123,10 +123,10 @@ struct PaywallView: View {
 
     private var subscribeCaption: String {
         if selectedPlan == .annual {
-            let price = annualProduct?.displayPrice ?? "$119.99"
+            let price = annualProduct?.displayPrice ?? "$59.99"
             return "\(price)/year, billed annually"
         } else {
-            let price = monthlyProduct?.displayPrice ?? "$17.99"
+            let price = monthlyProduct?.displayPrice ?? "$9.99"
             return "\(price)/month, cancel anytime"
         }
     }
